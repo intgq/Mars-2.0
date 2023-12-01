@@ -1,0 +1,195 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 40vmin;
+  pointer-events: none;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+  
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.vl {
+  border-left: 1px solid lightgray;
+  height: 780px;
+  position: absolute;
+  left: 47.5%;
+  margin-left: 0px;
+  top: 111px;
+}
+.myInlineDecoration {
+  color: red !important;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: bold;
+  font-style: oblique;
+}
+.procedure {
+  margin-top: 10px;
+  margin-bottom: 30px;
+  font-family: 'Consolas', Courier, monospace;
+  overflow:visible;
+}
+
+.program-text {
+  margin-top: 10px;
+  font-family: 'Consolas', Courier, monospace;
+  overflow:visible;
+}
+
+.program-text-hl {
+  background-color: yellow;
+  
+}
+
+.program-text-next-hl { 
+  background-color: springgreen;
+  
+}
+.procedure pre {
+  margin: 0px;
+  overflow: visible;
+}
+
+.program-text pre {
+  margin: 0px;
+  overflow: visible;
+}
+
+.event-list {
+  margin-top: 0px;
+  overflow: visible;
+}
+
+.event-list pre {
+  margin: 0px;
+  cursor: pointer;
+  overflow: visible;
+}
+.processes-list {
+  margin-top: 0px;
+  overflow: visible;
+}
+
+.processes-list pre {
+  margin: 0px;
+  cursor: pointer;
+  overflow: visible;
+}
+.callstack-list {
+  margin-top: 0px;
+  overflow: visible;
+}
+
+.callstack-list pre {
+  margin-top: 0px;
+  overflow: visible;
+}
+
+.event-list-hl {
+  background-color: yellow;
+}
+
+.menu-label {
+  margin: 0px 0px 0px 20px;
+  align-self: center;
+}
+.navbar{
+  position: absolute;
+  top: 0%;
+  bottom: 90%;
+  width: 100%;
+  object-fit: cover;
+}
+.toolbar{
+  position: absolute;
+  top: 10%;
+  bottom: 87%;
+  width: 100%;
+  object-fit: cover;
+}
+.headline{
+  position: absolute;
+  top: 13%;
+  bottom: 15%;
+  width: 100%;
+}
+.left {
+  display: inline-block;
+  max-width: 70%;
+  position: absolute;
+  top: 15%;
+  bottom: 0px;
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
+.event {
+  display: inline-block;
+  max-width: 30%;
+  vertical-align: top;
+  position: absolute;
+  top: 15%;
+  bottom: 50%;
+  left: 70%;
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
+.processes {
+  display: inline-block;
+  max-width: 30%;
+  vertical-align: top;
+  position: absolute;
+  top: 50%;
+  bottom: 20%;
+  left: 70%;
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
+.callstack {
+  display: inline-block;
+  max-width: 30%;
+  vertical-align: top;
+  position: absolute;
+  top: 80%;
+  bottom: 0%;
+  left: 70%;
+  overflow-y: scroll;
+  overflow-x: scroll;
+}
+.error-message {
+  margin-left: 10px;
+  position: absolute;
+  max-width: 70%;
+  top: 25%;
+  color: red;
+}
+
+input {
+  width: 50px;
+  height: 30px;
+  align-self: center;
+  margin-left: 10px;
+}

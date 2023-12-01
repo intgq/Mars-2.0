@@ -1,0 +1,7 @@
+package platform_nobus
+public
+	processor cpu
+		properties
+			scheduling_protocol => (hpf);
+	end cpu;
+end platform_nobus;

@@ -1,0 +1,286 @@
+{
+    "clientT": {
+        "Annex": {
+            "state": {
+                "s": [
+                    "initial",
+                    "complete",
+                    "final"
+                ]
+            },
+            "trans": {
+                "s": {
+                    "content": [
+                        "v := 1.0",
+                        "result := v",
+                        "<t_dot = 1 & t < 0.001> |> [] (busy_clientT? --> busy_Annex_clientT!; run_Annex_clientT?)",
+                        "clientT_non_blocking_call!",
+                        "<t_dot = 1 & t < 0.001> |> [] (busy_clientT? --> busy_Annex_clientT!; run_Annex_clientT?)",
+                        "clientT_blocking_call!; clientT_data_blocking!v; applyResource_clientT!; clientT_data_blocking_back?result; haveResource_clientT!; run_Annex_clientT?",
+                        "<t_dot = 1 & t < 0.002> |> [] (busy_clientT? --> busy_Annex_clientT!; run_Annex_clientT?)"
+                    ],
+                    "distination": "s"
+                }
+            },
+            "var": [
+                "v"
+            ]
+        },
+        "block" : true ,
+        "category": "thread",
+        "components": [],
+        "connections": [],
+        "features": [
+            {
+                "direction": "out",
+                "name": "result",
+                "type": "DataPort"
+            },
+            {
+                "category": "subprogramAccess",
+                "direction": "in out",
+                "name": "non_blocking",
+                "opas": [],
+                "type": "SubprogramAccess"
+            },
+            {
+                "category": "subprogramAccess",
+                "direction": "in out",
+                "name": "blocking",
+                "opas": [],
+                "type": "SubprogramAccess"
+            }
+        ],
+        "opas": [
+            {
+                "map_id": "@ownedSystemSubcomponent.0",
+                "name": "Deployment_Properties.Actual_Processor_Binding",
+                "type": "ListValue"
+            },
+            {
+                "name": "Thread_Properties.Dispatch_Protocol",
+                "type": "NamedValue",
+                "value": "Periodic"
+            },
+            {
+                "name": "Timing_Properties.Compute_Execution_Time",
+                "type": "RangeValue",
+                "value": [
+                    "6",
+                    "6"
+                ]
+            },
+            {
+                "name": "Timing_Properties.Period",
+                "type": "IntegerLiteral",
+                "value": "20"
+            }
+        ],
+        "parent": "myprocess"
+    },
+    "clientserver": {
+        "category": "system",
+        "components": [
+            {
+                "category": "process",
+                "name": "myprocess"
+            },
+            {
+                "category": "system",
+                "name": "myplatform"
+            }
+        ],
+        "connections": [],
+        "features": [],
+        "opas": [],
+        "parent": ""
+    },
+    "myplatform": {
+        "category": "system",
+        "components": [],
+        "connections": [],
+        "features": [],
+        "opas": [],
+        "parent": "clientserver"
+    },
+    "myprocess": {
+        "category": "process",
+        "components": [
+            {
+                "category": "thread",
+                "name": "clientT"
+            },
+            {
+                "category": "thread",
+                "name": "serverT"
+            }
+        ],
+        "connections": [
+            {
+                "bidirectional": "true",
+                "destination": "serverT.aser",
+                "kind": "accessConnection",
+                "name": "clientT.non_blocking <-> serverT.aser",
+                "source": "clientT.non_blocking"
+            },
+            {
+                "bidirectional": "true",
+                "destination": "serverT.hser",
+                "kind": "accessConnection",
+                "name": "clientT.blocking <-> serverT.hser",
+                "source": "clientT.blocking"
+            },
+            {
+                "bidirectional": "",
+                "destination": "clientT.non_blocking",
+                "kind": "accessConnection",
+                "name": "serverT.op1 -> clientT.non_blocking",
+                "source": "serverT.op1"
+            },
+            {
+                "bidirectional": "",
+                "destination": "clientT.blocking",
+                "kind": "accessConnection",
+                "name": "serverT.op2 -> clientT.blocking",
+                "source": "serverT.op2"
+            }
+        ],
+        "features": [],
+        "opas": [
+            {
+                "map_id": "@ownedSystemSubcomponent.0",
+                "name": "Deployment_Properties.Actual_Processor_Binding",
+                "type": "ListValue"
+            }
+        ],
+        "parent": "clientserver"
+    },
+    "op1": {
+        "category": "subprogram",
+        "components": [],
+        "connections": [],
+        "features": [],
+        "opas": [
+            {
+                "name": "Timing_Properties.Compute_Execution_Time",
+                "type": "RangeValue",
+                "value": [
+                    "3",
+                    "3"
+                ]
+            }
+        ],
+        "parent": "serverT"
+    },
+    "op2": {
+        "Annex": {
+            "state": {
+                "s": [
+                    "initial",
+                    "complete",
+                    "final"
+                ]
+            },
+            "trans": {
+                "s": {
+                    "content": [
+                        "y := x*2.0"
+                    ],
+                    "distination": "s"
+                }
+            },
+            "var": []
+        },
+        "category": "subprogram",
+        "components": [],
+        "connections": [],
+        "features": [
+            {
+                "category": "parameter",
+                "direction": "",
+                "name": "x",
+                "type": "Parameter"
+            },
+            {
+                "category": "parameter",
+                "direction": "out",
+                "name": "y",
+                "type": "Parameter"
+            }
+        ],
+        "opas": [
+            {
+                "name": "Timing_Properties.Compute_Execution_Time",
+                "type": "RangeValue",
+                "value": [
+                    "2",
+                    "2"
+                ]
+            }
+        ],
+        "parent": "serverT"
+    },
+    "serverT": {
+        "category": "thread",
+        "components": [
+            {
+                "category": "subprogram",
+                "name": "op1",
+                "access": "aser"
+            },
+            {
+                "category": "subprogram",
+                "name": "op2",
+                "access": "hser"
+            }
+        ],
+        "block": false ,
+        "connections": [],
+        "features": [
+            {
+                "category": "subprogramAccess",
+                "direction": "in out",
+                "name": "aser",
+                "opas": [
+                    {
+                        "name": "Behavior_Properties.Subprogram_Call_Protocol",
+                        "type": "NamedValue",
+                        "value": "ASER"
+                    }
+                ],
+                "type": "SubprogramAccess"
+            },
+            {
+                "category": "subprogramAccess",
+                "direction": "in out",
+                "name": "hser",
+                "opas": [
+                    {
+                        "name": "Behavior_Properties.Subprogram_Call_Protocol",
+                        "type": "NamedValue",
+                        "value": "HSER"
+                    }
+                ],
+                "type": "SubprogramAccess"
+            }
+        ],
+        "opas": [
+            {
+                "map_id": "@ownedSystemSubcomponent.0",
+                "name": "Deployment_Properties.Actual_Processor_Binding",
+                "type": "ListValue"
+            },
+            {
+                "name": "Thread_Properties.Dispatch_Protocol",
+                "type": "NamedValue",
+                "value": "Sporadic"
+            },
+            {
+                "name": "Timing_Properties.Period",
+                "type": "IntegerLiteral",
+                "value": "10"
+            }
+        ],
+        "parent": "myprocess"
+    }
+}

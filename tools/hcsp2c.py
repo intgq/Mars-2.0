@@ -1,5 +1,10 @@
 import argparse
 import subprocess
+import sys
+import os
+
+sys.path.append(os.getcwd())
+# print(sys.path)
 
 from hcsp2c import transfer2c
 from ss2hcsp.hcsp.parser import parse_module_file

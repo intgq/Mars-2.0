@@ -152,7 +152,7 @@ def translate_continuous(diagram):
     var_subst = dict()
 
     for block in diagram:
-        if block.type in ('add', 'product', 'bias', 'gain', 'constant', 'square',
+        if block.type in ('add', 'product', 'bias', 'gain', 'constant', 'square', 'relation',
                           'sqrt', 'switch', 'sine', 'fcn', 'mux', 'selector', 'saturation','hitcross'):
             var_subst.update(block.get_var_subst())
         elif block.type == "integrator":

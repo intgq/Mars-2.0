@@ -66,6 +66,13 @@ def parse_value(value, default=None):
     if value:
         if '.' in value:
             return float(value)
+        elif '[' in value and ']' in value:
+            assert len(value) >3
+            value = value[1:-1]
+            assert len (value.split(":")) == 2
+            start_val = value.split(":")[0]
+            end_val = value.split(":")[1]
+            return range(int(start_val),int(end_val))
         else:
             return int(value)
     else:
@@ -526,12 +533,12 @@ class SL_Diagram:
                 else:  # op_name == None, meaning it is an AND block
                     self.add_block(And(name=block_name, num_dest=num_dest, st=sample_time))
             elif block_type == "RelationalOperator":
-                relation = get_attribute_value(block, "Operator")
-                if not relation:
-                    relation = block_parameters["RelationalOperator"]["Operator"]
-                if relation == "~=":
-                    relation = "!="
-                self.add_block(Relation(name=block_name, relation=relation, st=sample_time))
+                op = get_attribute_value(block, "Operator")
+                if not op:
+                    op = block_parameters["RelationalOperator"]["Operator"]
+                if op == "~=":
+                    op = "!="
+                self.add_block(Relation(name=block_name, op=op, st=sample_time))
             elif block_type == "Reference":
                 # check if it is a discrete PID
                 block_type = get_attribute_value(block, "SourceType")

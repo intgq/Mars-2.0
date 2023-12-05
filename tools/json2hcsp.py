@@ -1,6 +1,11 @@
 import argparse
 import json
 import pdb
+import sys
+import os
+
+sys.path.append(os.getcwd())
+# print(sys.path)
 
 from aadl2hcsp.json2hcsp import translate_aadl_from_json
 from ss2hcsp.hcsp.hcsp import convert_infos_to_concrete_chs, has_all_concrete_chs

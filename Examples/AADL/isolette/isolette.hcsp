@@ -1,8 +1,8 @@
 systemDef isollete ::= babybox || ACT_sensor || COM_sensor || ACT_actuator || COM_actuator || ACT_controller || COM_controller || heatSW_Conn_0 || heatSW_Conn_1 || heatSW_Conn_2 || heatSW_Conn_3 || isollete_Conn_0 || isollete_Conn_1
 
-variableDef ::= InitFlag; ready_num; x0; heatCommand; diff; state; q; c; run_prior; boxTemp; prior; t; run_queue; e; run_now; measuredTemp; x; gain
+variableDef ::= state; InitFlag; run_prior; measuredTemp; run_queue; run_now; c; boxTemp; gain; q; x0; t; diff; prior; e; heatCommand; x; ready_num
 
-channelDef ::= tran_controller; actuator_heatCommand; act_actuator; busy_actuator; actuator_data_diff; free; act_controller; sensor_boxTemp; controller_data_measuredTemp; controller_diff; act_sensor; tran_actuator; busy_controller; babybox_heatCommand; heatSW_boxTemp; run_controller; run_actuator; busy_sensor; controller_measuredTemp; sensor_measuredTemp; actuator_diff; tran_sensor; heatSW_heatCommand; run_sensor; babybox_boxTemp
+channelDef ::= tran_actuator; busy_actuator; controller_diff; tran_sensor; run_controller; heatSW_heatCommand; busy_controller; run_sensor; act_sensor; actuator_heatCommand; heatSW_boxTemp; tran_controller; act_actuator; free; actuator_data_diff; sensor_boxTemp; run_actuator; babybox_heatCommand; controller_data_measuredTemp; busy_sensor; actuator_diff; babybox_boxTemp; sensor_measuredTemp; act_controller; controller_measuredTemp
 
 processDef SC0 ::= heatSW_boxTemp??x;; sensor_boxTemp!!x;
 processDef heatSW_Conn_0 ::= SC0**

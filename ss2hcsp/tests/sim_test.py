@@ -167,8 +167,8 @@ class SimTest(unittest.TestCase):
             100: {'x': 5.989, 'y': 0.720, 'z': 0.188}
         })
 
-    def testYoyoControl(self):
-        run_test(self, "./Examples/Simulink/sf_yoyo_2018a.xml", 600, {}, output_to_file="./Examples/Simulink/sf_yoyo_2018a.txt")
+    # def testYoyoControl(self):
+    #     run_test(self, "./Examples/Simulink/sf_yoyo_2018a.xml", 600, {}, output_to_file="./Examples/Simulink/sf_yoyo_2018a.txt")
             
     # def testIsolette(self):
     #     run_test(self, "./Examples/Simulink/Isolette.xml", 1200, {

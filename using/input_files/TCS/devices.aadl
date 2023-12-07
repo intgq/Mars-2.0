@@ -1,0 +1,87 @@
+package devices
+public
+	device camera
+		features
+			img: out data port;
+		properties
+			period => 200ms;
+			compute_execution_time => 20ms..50ms;
+	end camera;
+	
+	device implementation camera.imp
+		annex HCSP{** { outputs["camera"]["img"]!-1; wait(0.2); }* **};
+	end camera.imp;
+	
+	device radar
+		features
+			obs_pos_radar: out data port;
+		properties
+			period => 10ms;
+			compute_execution_time => 6ms..8ms;
+	end radar;
+	
+	device implementation radar.imp
+		annex HCSP{** t := 0; data := 0.0; { if (t < 10) { data := 0.0; } else if (t < 20) { slope := (55 - 35) / (20 - 10); data := 35 + slope * (t - 10); } else { data := 0.0; } outputs["radar"]["obs_pos_radar"]!data; wait(0.01); t := t + 0.01; }* **};
+	end radar.imp;
+	
+	device actuator
+		features
+			cmd: in data port;
+			veh_a: out data port;
+		properties
+			period => 2ms;
+	end actuator;
+	
+	device implementation actuator.imp
+	    annex HCSP{** { inputs["actuator"]["cmd"]?cmd; outputs["PHY_vehicle_imp"]["veh_a"]!cmd; wait(0.002); }* **};
+	end actuator.imp;
+	
+	device GPS
+		features
+			veh_s: in data port;
+			veh_pos: out data port;
+		properties
+			period => 6ms;
+	end GPS;
+	
+	device implementation GPS.imp
+	    annex HCSP{** { inputs["PHY_vehicle_imp"]["veh_s"]?data; outputs["GPS"]["veh_pos"]!data; wait(0.006); }* **};
+	end GPS.imp;
+	
+	device laser
+		features
+			veh_l_v: in data port;
+			laser_valid: out data port;
+			laser_v: out data port;
+		properties
+			period => 10ms;
+			compute_execution_time => 6ms..9ms;
+	end laser;
+	
+	device implementation laser.imp
+		annex HCSP{** { inputs["PHY_vehicle_imp"]["veh_v_l"]?data; t := 0; {t_dot = 1 & t < 0.01} |> [] (outputs["laser"]["laser_valid"]!1.0 --> {error := 0; x := data + error; outputs["laser"]["laser_v"]!(data+error);}) {t_dot = 1 & t < 0.01} }* **};
+	end laser.imp;
+	
+	device wheel
+		features
+			veh_w_v: in data port;
+			wheel_valid: out data port;
+			wheel_v : out data port;
+		properties
+			period => 10ms;
+			compute_execution_time => 6ms..9ms;
+	end wheel;
+	
+	device implementation wheel.imp
+		annex HCSP{** { inputs["PHY_vehicle_imp"]["veh_v_w"]?data; t := 0; {t_dot = 1 & t < 0.01} |> [] (outputs["wheel"]["wheel_valid"]!1.0 --> {error := 0; x := data + error; outputs["wheel"]["wheel_v"]!(data+error);}) {t_dot = 1 & t < 0.01} }* **};
+	end wheel.imp;
+	
+	device user_panel
+		features
+			event: out event port;
+	end user_panel;
+	
+	device implementation user_panel.imp
+		annex HCSP{** outputs["user_panel"]["event"]!"inc"; wait(0.5); outputs["user_panel"]["event"]!"inc"; wait(0.5); outputs["user_panel"]["event"]!"inc"; wait(29); outputs["user_panel"]["event"]!"dec"; outputs["user_panel"]["event"]!"dec"; **};
+	end user_panel.imp;
+end devices;

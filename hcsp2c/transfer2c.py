@@ -354,21 +354,23 @@ def transferToCExpr(e: expr.Expr) -> str:
             return "0"
     elif isinstance(e, expr.ListExpr):
         res = "midList = listInit();\n"
-        for i in range(e.count):
-            b = e.args[i]
-            if isinstance(b, expr.AVar):
-                if isinstance(gl_var_type[b.name], RealType):
-                    res += "midList = listPush(midList, (void*)(&%s), 1)" % b
-                elif isinstance(gl_var_type[b.name], StringType):
-                    res += "midList = listPush(midList, (void*)(&%s), 2)" % b
-                elif isinstance(gl_var_type[b.name], ListType):
-                    res += "midList = listPush(midList, (void*)(&%s), 3)" % b
-            elif isinstance(b, expr.AConst) and isinstance(b.value, str):
-                res += "midList = listPush(midList, (void*)strInit(%s), 2)" % b
-            elif isinstance(b, expr.ListExpr):
-                raise AssertionError("cannot push a raw list to a list")
-            else:
-                res += "midList = listPushNum(midList, %s)" % b
+
+        # if initial list is not empty, use code below to handle
+        # for i in range(e.count):
+            # b = e.args[0]
+            # if isinstance(b, expr.AVar):
+            #     if isinstance(gl_var_type[b.name], RealType):
+            #         res += "midList = listPush(midList, (void*)(&%s), 1)" % b
+            #     elif isinstance(gl_var_type[b.name], StringType):
+            #         res += "midList = listPush(midList, (void*)(&%s), 2)" % b
+            #     elif isinstance(gl_var_type[b.name], ListType):
+            #         res += "midList = listPush(midList, (void*)(&%s), 3)" % b
+            # elif isinstance(b, expr.AConst) and isinstance(b.value, str):
+            #     res += "midList = listPush(midList, (void*)strInit(%s), 2)" % b
+            # elif isinstance(b, expr.ListExpr):
+            #     raise AssertionError("cannot push a raw list to a list")
+            # else:
+            #     res += "midList = listPushNum(midList, %s)" % b
 
         return res
     elif isinstance(e, expr.IfExpr):

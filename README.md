@@ -1,26 +1,26 @@
-##**Dependencies**
-###**Lark**
+## **Dependencies**
+### **Lark**
 Used in: all
 
 For HCSP code translation and generation, we use lark frame to build our parser. You may install lark by direction of their official guide:https://lark-parser.readthedocs.io/en/stable/
 
-###**Node**
+### **Node**
 Used in:hhlpy, hcsp_simulator
 
 For gui of hhlpy and hcsp_simulator, we use Javascript to write frontend,so Node is needed. You may install Node by direction of their official guide:https://nodejs.org/
 
-###**Flask**
+### **Flask**
 Used in:hhlpy, hcsp_simulator
 
 For backend of hcsp_simulator, we use Flask frame to write backend. You may install Flask by direction of their official guide:https://flask.palletsprojects.com/en/3.0.x/
 
-###**Isabelle**
+### **Isabelle**
 Used in: HHLProver
 
 HHLProver is an extension of Isabelle,so you may install Isabelle2023 from:
 https://isabelle.in.tum.de/, for details, see[HHLProver_README](./HHLProver/README.md)
 
-###**Ubuntu 20.04**
+### **Ubuntu 20.04**
 Used in: hcsp2c
 
 In hcsp2c, certain package for compile is only in linux, so linux system is need.
@@ -31,8 +31,8 @@ In Ubuntu, gcc needs to be installed with cmd
    sudo apt install gcc   
 ```
 
-##**Tool chain Usages**
-###**AADL2HCSP**
+## **Tool chain Usages**
+### **AADL2HCSP**
 
 
 To translate AADL to HCSP, first run aadl2json.py in folder "Mars2.0/tools", name of startfile, config file and the dir folder path of them needs to be specified as arguments, for example, 
@@ -47,7 +47,7 @@ and the output JSON file is under the dir folder path, then translate it to HCSP
 ```
 Note: for model with multipule files that consists of usage "import", path of imported HCSP module needs to be written in ss2hcsp/import_path.txt, you may create this file and maintain it manually
 
-###**Simulink/Stateflow2HCSP**
+### **Simulink/Stateflow2HCSP**
 
 To tranlate S/S model to HCSP, first you need to convert S/S model(mdl or xls file) to .xml file, matlab provide following cmd:
 
@@ -79,7 +79,7 @@ We provide 2 ways of formally verification
 1) hhlpy, based on Wolfram Engine, and the usage of it see [hhlpy_README](./hhlpy/README.md)
 2) HHLprover+ Isabelle, usage of it see [HHLProver_README](./HHLProver/README.md)
 
-###**HCSP2C**
+### **HCSP2C**
 
 To turn HCSP to C file, first run hcsp2Ccode.py in folder "Mars2.0/tools", for example,
 

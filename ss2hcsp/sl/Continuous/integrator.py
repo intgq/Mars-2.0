@@ -1,3 +1,5 @@
+from decimal import Decimal
+from fractions import Fraction
 from ss2hcsp.sl.sl_block import SL_Block
 from ss2hcsp.hcsp.parser import hp_parser
 
@@ -7,7 +9,7 @@ class Integrator(SL_Block):
     def __init__(self, name, init_value=0):
         super(Integrator, self).__init__("integrator", name, 1, 1, st=0)
 
-        assert isinstance(init_value, (int, float))
+        assert isinstance(init_value, (int, Decimal, Fraction))
         self.init_value = init_value
 
     def __str__(self):

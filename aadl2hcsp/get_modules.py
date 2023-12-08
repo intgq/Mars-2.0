@@ -1,4 +1,5 @@
 """Obtain submodules in the AADL to HCSP translation."""
+from decimal import Decimal
 
 from ss2hcsp.sl.get_hcsp import translate_continuous
 from ss2hcsp.hcsp.expr import AConst, AVar, RelExpr, conj, disj, true_expr
@@ -179,6 +180,8 @@ def get_continuous_module(name, ports, inputvalues, continuous_diagram, outputs)
         else:
             raise RuntimeError("Not implemented!")
     for port_name ,(var_name, val) in inputvalues.items():
+        if isinstance (val,float):
+            val = Decimal(str(val))
         init_hps.append(hp.Assign(var_name=var_name, expr=AConst(val)))
     init_hps = hp.Sequence(*init_hps) if len(init_hps) >= 2 else init_hps[0]
 

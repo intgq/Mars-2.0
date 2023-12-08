@@ -39,7 +39,7 @@ endmodule
 
 module data_ctrl():
 begin
-  global_x := [1,2];
+  global_x := [1, 2];
   {
     global_x_in!global_x -->
       skip; $

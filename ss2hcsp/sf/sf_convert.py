@@ -1,5 +1,6 @@
 """Converting a Stateflow chart to HCSP process."""
 
+from decimal import Decimal
 from ss2hcsp.sl import Continuous
 from ss2hcsp.hcsp.pprint import pprint
 from ss2hcsp.sf.sf_state import OR_State, AND_State, Junction, GraphicalFunction
@@ -64,7 +65,7 @@ class SFConvert:
             self.messages = self.chart_parameters['message_dict']
 
         # Sample time
-        self.sample_time = 0.1
+        self.sample_time = Decimal("0.1")
         if 'st' in self.chart_parameters and self.chart_parameters['st'] != -1:
             self.sample_time = self.chart_parameters['st']
 
@@ -1035,7 +1036,7 @@ class SFConvert:
         if self.ode_map:
             procs.append(self.get_ode(self.chart.diagram, cur_states=[], cur_eqs=[]))
         else:
-            procs.append(hcsp.Wait(expr.AConst(self.sample_time)))       
+            procs.append(hcsp.Wait(expr.AConst(self.sample_time)))
 
         # Update counter for absolute time events
         for ssid in self.absolute_time_events:

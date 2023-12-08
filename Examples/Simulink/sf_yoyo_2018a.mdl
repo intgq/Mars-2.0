@@ -47,7 +47,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [714.0, 267.0, 1227.0, 750.0]
+      Location		      [666.0, 241.0, 1227.0, 750.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -79,11 +79,11 @@ Model {
 	Object {
 	  $ObjectID		  6
 	  IsActive		  [0]
-	  ViewObjType		  "SimulinkSubsys"
-	  LoadSaveID		  "14"
-	  Extents		  [1173.0, 568.0]
-	  ZoomFactor		  [1.0]
-	  Offset		  [-492.0, -216.50000000000006]
+	  ViewObjType		  "StateflowChart"
+	  LoadSaveID		  "1"
+	  Extents		  [588.0, 433.0]
+	  ZoomFactor		  [1.5727391874180865]
+	  Offset		  [-228.48945844587473, -48.916255791979353]
 	}
 	PropName		"EditorsInfo"
       }
@@ -92,18 +92,6 @@ Model {
 	Dimension		2
 	Object {
 	  $ObjectID		  7
-	  Type			  "GLUE2:DDG Component"
-	  ID			  "SymbolManager"
-	  Visible		  [0]
-	  CreateCallback	  "Stateflow.Interface.Panel.createSymbolManagerComponent"
-	  UserData		  "0"
-	  Floating		  [0]
-	  DockPosition		  "Right"
-	  Width			  [254]
-	  Height		  [665]
-	}
-	Object {
-	  $ObjectID		  8
 	  Type			  "GLUE2:PropertyInspector"
 	  ID			  "Property Inspector"
 	  Visible		  [0]
@@ -114,15 +102,27 @@ Model {
 	  Width			  [640]
 	  Height		  [480]
 	}
+	Object {
+	  $ObjectID		  8
+	  Type			  "GLUE2:DDG Component"
+	  ID			  "SymbolManager"
+	  Visible		  [0]
+	  CreateCallback	  "Stateflow.Interface.Panel.createSymbolManagerComponent"
+	  UserData		  "0"
+	  Floating		  [0]
+	  DockPosition		  "Right"
+	  Width			  [254]
+	  Height		  [665]
+	}
 	PropName		"DockComponentsInfo"
       }
       WindowState	      "AAAA/wAAAAD9AAAAAgAAAAAAAAC9AAAB+PwCAAAABPsAAAAWAEQAbwBjAGsAVwBpAGQAZwBlAHQAMwEAAAAxAAAB+AAAA"
       "AAAAAAA+wAAABYARABvAGMAawBXAGkAZABnAGUAdAA0AAAAAAD/////AAAAAAAAAAD7AAAAUgBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0Ac"
       "ABvAG4AZQBuAHQALwBHAEwAVQBFADIAIAB0AHIAZQBlACAAYwBvAG0AcABvAG4AZQBuAHQAAAAAAP////8AAABjAP////sAAABgAFMAaQBtAHUAb"
       "ABpAG4AawA6AEUAZABpAHQAbwByADoAUgBlAGYAZQByAGUAbgBjAGUAZABGAGkAbABlAHMALwBSAGUAZgBlAHIAZQBuAGMAZQBkACAARgBpAGwAZ"
-      "QBzAAAAAAD/////AAAAAAAAAAAAAAABAAAA+gAAAnT8AgAAAAL7AAAAVABHAEwAVQBFADIAOgBQAHIAbwBwAGUAcgB0AHkASQBuAHMAcABlAGMAd"
+      "QBzAAAAAAD/////AAAAAAAAAAAAAAABAAAA+gAAA2H8AgAAAAL7AAAAVABHAEwAVQBFADIAOgBQAHIAbwBwAGUAcgB0AHkASQBuAHMAcABlAGMAd"
       "ABvAHIALwBQAHIAbwBwAGUAcgB0AHkAIABJAG4AcwBwAGUAYwB0AG8AcgAAAAAA/////wAAACwA////+wAAAEIARwBMAFUARQAyADoARABEAEcAI"
-      "ABDAG8AbQBwAG8AbgBlAG4AdAAvAFMAeQBtAGIAbwBsAE0AYQBuAGEAZwBlAHIAAAAAPwAAAnQAAAAeAP///wAABLsAAAJ0AAAAAQAAAAIAAAABA"
+      "ABDAG8AbQBwAG8AbgBlAG4AdAAvAFMAeQBtAGIAbwBsAE0AYQBuAGEAZwBlAHIAAAAAtQAAA2EAAAAeAP///wAABLsAAAJ0AAAAAQAAAAIAAAABA"
       "AAAAvwAAAABAAAAAgAAAA//////AAAAAAD/////AAAAAAAAAAD/////AQAAAAD/////AAAAAAAAAAD/////AAAAAAD/////AAAAAAAAAAD/////A"
       "AAAAAD/////AAAAAAAAAAD/////AAAAAAD/////AAAAAAAAAAD/////AQAAAHn/////AAAAAAAAAAD/////AQAAANr/////AAAAAAAAAAD/////A"
       "AAAAAD/////AAAAAAAAAAD/////AQAAAVP/////AAAAAAAAAAD/////AAAAAAD/////AAAAAAAAAAD/////AAAAAAD/////AAAAAAAAAAD/////A"
@@ -136,8 +136,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "gaoqiang"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Nov 20 14:22:17 2023"
-  RTWModifiedTimeStamp	  622390739
+  LastModifiedDate	  "Thu Dec 07 11:29:03 2023"
+  RTWModifiedTimeStamp	  623849317
   ModelVersionFormat	  "1.%<AutoIncrement:1>"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -1218,7 +1218,7 @@ Model {
   }
   System {
     Name		    "sf_yoyo_2018a"
-    Location		    [714, 267, 1941, 1017]
+    Location		    [666, 241, 1893, 991]
     Open		    on
     PortBlocksUseCompactNotation off
     SetDomainSpec	    off
@@ -1251,8 +1251,8 @@ Model {
       SFBlockType	      "Chart"
       System {
 	Name			"Chart"
-	Location		[733, 318, 1960, 1068]
-	Open			off
+	Location		[40, 40, 1267, 790]
+	Open			on
 	PortBlocksUseCompactNotation off
 	SetDomainSpec		off
 	DomainSpecType		"Deduce"
@@ -1356,40 +1356,7 @@ Model {
     }
     Block {
       BlockType		      Integrator
-      Name		      "Compute\ntheta"
-      SID		      "2"
-      Ports		      [1, 1]
-      Position		      [385, 135, 415, 165]
-      ZOrder		      -2
-      InitialCondition	      "0.16"
-      Port {
-	PortNumber		1
-	Name			"theta"
-      }
-    }
-    Block {
-      BlockType		      Integrator
-      Name		      "Compute\ntheta_dot"
-      SID		      "3"
-      Ports		      [1, 1]
-      Position		      [280, 135, 310, 165]
-      ZOrder		      -3
-      Port {
-	PortNumber		1
-	Name			"theta_dot"
-      }
-    }
-    Block {
-      BlockType		      Fcn
-      Name		      "Compute\ntheta_dot_dot"
-      SID		      "4"
-      Position		      [180, 135, 240, 165]
-      ZOrder		      -4
-      Expr		      "-(2*u(4)*u(2)+9.8*sin(u(1)))/u(3)"
-    }
-    Block {
-      BlockType		      Integrator
-      Name		      "Compute l"
+      Name		      "Compute_l"
       SID		      "5"
       Ports		      [1, 1]
       Position		      [275, 210, 305, 240]
@@ -1403,34 +1370,37 @@ Model {
       }
     }
     Block {
-      BlockType		      Scope
-      Name		      "Energy\nscope"
-      SID		      "6"
-      Ports		      [1]
-      Position		      [640, 114, 670, 146]
-      ZOrder		      -6
-      ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
-      "gr.Configuration('Core','General UI',true),extmgr.Configuration('Core','Source UI',true),extmgr.Configuration('S"
-      "ources','WiredSimulink',true,'DataLogging',true,'DataLoggingVariableName','EnergyTraj','DataLoggingSaveFormat','"
-      "StructureWithTime'),extmgr.Configuration('Visuals','Time Domain',true,'SerializedDisplays',{struct('MinYLimReal'"
-      ",'0','MaxYLimReal','15','YLabelReal','','MinYLimMag','0','MaxYLimMag','10','LegendVisibility','off','XGrid',true"
-      ",'YGrid',true,'PlotMagPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.686274509803922 0.686274509803922 0.68"
-      "6274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.623529411764706 1;1 0.411764705882353 0"
-      ".16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.717647058823529 0.274509803921569 1;0.0"
-      "588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLabel>','LinePropertiesCache',{{}},"
-      "'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',true,'Placement',1)},'DisplayProper"
-      "tyDefaults',struct('MinYLimReal','0','MaxYLimReal','15','YLabelReal','','MinYLimMag','0','MaxYLimMag','10','Lege"
-      "ndVisibility','off','XGrid',true,'YGrid',true,'PlotMagPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.686274"
-      "509803922 0.686274509803922 0.686274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.6235294"
-      "11764706 1;1 0.411764705882353 0.16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.7176470"
-      "58823529 0.274509803921569 1;0.0588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLab"
-      "el>','LinePropertiesCache',{{}},'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',tru"
-      "e,'Placement',1),'TimeRangeSamples','500'),extmgr.Configuration('Tools','Plot Navigation',true,'OnceAtStop',fals"
-      "e),extmgr.Configuration('Tools','Measurements',true,'Threshold','0','NumPeaks','Inf','MinPeakDistance','1','MinP"
-      "eakHeight','-Inf','ShowText',false,'TextFormat','%.1f,%.1f','TextValues','xy','Version','2022b')),'Version','202"
-      "3b','Location',[1040 426 1358 631])"
-      NumInputPorts	      "1"
-      Floating		      off
+      BlockType		      Integrator
+      Name		      "Compute_theta"
+      SID		      "2"
+      Ports		      [1, 1]
+      Position		      [385, 135, 415, 165]
+      ZOrder		      -2
+      InitialCondition	      "0.16"
+      Port {
+	PortNumber		1
+	Name			"theta"
+      }
+    }
+    Block {
+      BlockType		      Integrator
+      Name		      "Compute_theta_dot"
+      SID		      "3"
+      Ports		      [1, 1]
+      Position		      [280, 135, 310, 165]
+      ZOrder		      -3
+      Port {
+	PortNumber		1
+	Name			"theta_dot"
+      }
+    }
+    Block {
+      BlockType		      Fcn
+      Name		      "Compute_theta_dot_dot"
+      SID		      "4"
+      Position		      [180, 135, 240, 165]
+      ZOrder		      -4
+      Expr		      "-(2*u(4)*u(2)+9.8*sin(u(1)))/u(3)"
     }
     Block {
       BlockType		      SubSystem
@@ -1534,6 +1504,36 @@ Model {
       }
     }
     Block {
+      BlockType		      Scope
+      Name		      "Energy_scope"
+      SID		      "6"
+      Ports		      [1]
+      Position		      [640, 114, 670, 146]
+      ZOrder		      -6
+      ScopeSpecificationString "Simulink.scopes.TimeScopeBlockCfg('CurrentConfiguration', extmgr.ConfigurationSet(extm"
+      "gr.Configuration('Core','General UI',true),extmgr.Configuration('Core','Source UI',true),extmgr.Configuration('S"
+      "ources','WiredSimulink',true,'DataLogging',true,'DataLoggingVariableName','EnergyTraj','DataLoggingSaveFormat','"
+      "StructureWithTime'),extmgr.Configuration('Visuals','Time Domain',true,'SerializedDisplays',{struct('MinYLimReal'"
+      ",'0','MaxYLimReal','15','YLabelReal','','MinYLimMag','0','MaxYLimMag','10','LegendVisibility','off','XGrid',true"
+      ",'YGrid',true,'PlotMagPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.686274509803922 0.686274509803922 0.68"
+      "6274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.623529411764706 1;1 0.411764705882353 0"
+      ".16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.717647058823529 0.274509803921569 1;0.0"
+      "588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLabel>','LinePropertiesCache',{{}},"
+      "'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',true,'Placement',1)},'DisplayProper"
+      "tyDefaults',struct('MinYLimReal','0','MaxYLimReal','15','YLabelReal','','MinYLimMag','0','MaxYLimMag','10','Lege"
+      "ndVisibility','off','XGrid',true,'YGrid',true,'PlotMagPhase',false,'AxesColor',[0 0 0],'AxesTickColor',[0.686274"
+      "509803922 0.686274509803922 0.686274509803922],'ColorOrder',[1 1 0.0666666666666667;0.0745098039215686 0.6235294"
+      "11764706 1;1 0.411764705882353 0.16078431372549;0.392156862745098 0.831372549019608 0.0745098039215686;0.7176470"
+      "58823529 0.274509803921569 1;0.0588235294117647 1 1;1 0.0745098039215686 0.650980392156863],'Title','%<SignalLab"
+      "el>','LinePropertiesCache',{{}},'UserDefinedChannelNames',{{}},'NumLines',0,'LineNames',{{[]}},'ShowContent',tru"
+      "e,'Placement',1),'TimeRangeSamples','500'),extmgr.Configuration('Tools','Plot Navigation',true,'OnceAtStop',fals"
+      "e),extmgr.Configuration('Tools','Measurements',true,'Threshold','0','NumPeaks','Inf','MinPeakDistance','1','MinP"
+      "eakHeight','-Inf','ShowText',false,'TextFormat','%.1f,%.1f','TextValues','xy','Version','2022b')),'Version','202"
+      "3b','Location',[1040 426 1358 631])"
+      NumInputPorts	      "1"
+      Floating		      off
+    }
+    Block {
       BlockType		      Gain
       Name		      "Gain"
       SID		      "12"
@@ -1547,7 +1547,7 @@ Model {
     }
     Block {
       BlockType		      Scope
-      Name		      "Length\nscope"
+      Name		      "Length_scope"
       SID		      "13"
       Ports		      [1]
       Position		      [400, 339, 430, 371]
@@ -1601,8 +1601,8 @@ Model {
       }
       System {
 	Name			"Lmax"
-	Location		[255, 305, 1482, 1055]
-	Open			on
+	Location		[453, 681, 788, 806]
+	Open			off
 	PortBlocksUseCompactNotation off
 	SetDomainSpec		off
 	DomainSpecType		"Deduce"
@@ -1701,7 +1701,7 @@ Model {
       }
       System {
 	Name			"Lmin"
-	Location		[495, 294, 1722, 1044]
+	Location		[453, 681, 788, 806]
 	Open			off
 	PortBlocksUseCompactNotation off
 	SetDomainSpec		off
@@ -1824,8 +1824,24 @@ Model {
       ButtonText	      "?"
     }
     Block {
+      BlockType		      HitCross
+      Name		      "ThetaDotZero"
+      SID		      "28"
+      Ports		      [1, 1]
+      Position		      [395, 45, 425, 75]
+      ZOrder		      -16
+    }
+    Block {
+      BlockType		      HitCross
+      Name		      "ThetaZero"
+      SID		      "29"
+      Ports		      [1, 1]
+      Position		      [475, 65, 505, 95]
+      ZOrder		      -17
+    }
+    Block {
       BlockType		      Scope
-      Name		      "Theta\nscope"
+      Name		      "Theta_scope"
       SID		      "27"
       Ports		      [1]
       Position		      [495, 134, 525, 166]
@@ -1854,22 +1870,6 @@ Model {
       Floating		      off
     }
     Block {
-      BlockType		      HitCross
-      Name		      "ThetaDotZero"
-      SID		      "28"
-      Ports		      [1, 1]
-      Position		      [395, 45, 425, 75]
-      ZOrder		      -16
-    }
-    Block {
-      BlockType		      HitCross
-      Name		      "ThetaZero"
-      SID		      "29"
-      Ports		      [1, 1]
-      Position		      [475, 65, 505, 95]
-      ZOrder		      -17
-    }
-    Block {
       BlockType		      Fcn
       Name		      "Total energy "
       SID		      "30"
@@ -1879,9 +1879,9 @@ Model {
     }
     Line {
       ZOrder		      1
-      SrcBlock		      "Compute\ntheta_dot_dot"
+      SrcBlock		      "Compute_theta_dot_dot"
       SrcPort		      1
-      DstBlock		      "Compute\ntheta_dot"
+      DstBlock		      "Compute_theta_dot"
       DstPort		      1
     }
     Line {
@@ -1895,12 +1895,12 @@ Model {
       Name		      "theta_dot"
       ZOrder		      3
       Labels		      [0, 1]
-      SrcBlock		      "Compute\ntheta_dot"
+      SrcBlock		      "Compute_theta_dot"
       SrcPort		      1
       Points		      [45, 0]
       Branch {
 	ZOrder			4
-	DstBlock		"Compute\ntheta"
+	DstBlock		"Compute_theta"
 	DstPort			1
       }
       Branch {
@@ -1925,7 +1925,7 @@ Model {
       Points		      [30, 0]
       Branch {
 	ZOrder			8
-	DstBlock		"Compute l"
+	DstBlock		"Compute_l"
 	DstPort			1
       }
       Branch {
@@ -1940,7 +1940,7 @@ Model {
       Name		      "theta"
       ZOrder		      10
       Labels		      [0, 1]
-      SrcBlock		      "Compute\ntheta"
+      SrcBlock		      "Compute_theta"
       SrcPort		      1
       Points		      [30, 0]
       Branch {
@@ -1951,7 +1951,7 @@ Model {
       }
       Branch {
 	ZOrder			12
-	DstBlock		"Theta\nscope"
+	DstBlock		"Theta_scope"
 	DstPort			1
       }
       Branch {
@@ -2015,7 +2015,7 @@ Model {
       Name		      "l"
       ZOrder		      21
       Labels		      [0, 0]
-      SrcBlock		      "Compute l"
+      SrcBlock		      "Compute_l"
       SrcPort		      1
       Points		      [35, 0]
       Branch {
@@ -2032,7 +2032,7 @@ Model {
 	  Branch {
 	    ZOrder		    25
 	    Points		    [0, 30]
-	    DstBlock		    "Length\nscope"
+	    DstBlock		    "Length_scope"
 	    DstPort		    1
 	  }
 	  Branch {
@@ -2053,7 +2053,7 @@ Model {
       SrcBlock		      "Mux2"
       SrcPort		      1
       Points		      [0, -50; -405, 0]
-      DstBlock		      "Compute\ntheta_dot_dot"
+      DstBlock		      "Compute_theta_dot_dot"
       DstPort		      1
     }
     Line {
@@ -2064,7 +2064,7 @@ Model {
       Branch {
 	ZOrder			30
 	Points			[0, -75]
-	DstBlock		"Energy\nscope"
+	DstBlock		"Energy_scope"
 	DstPort			1
       }
       Branch {
@@ -2118,12 +2118,13 @@ Stateflow {
     id			    2
     machine		    1
     name		    "Chart"
-    windowPosition	    [733 318 1227 750]
+    windowPosition	    [20 44 850 722]
     viewLimits		    [-228.489 145.381 -48.916 226.4]
     zoomFactor		    0.848
     screen		    [1 1 3200 1200 1.25]
     treeNode		    [0 3 0 0]
     viewObj		    2
+    visible		    1
     subviewS {
       x1		      4.455
       y1		      13.327

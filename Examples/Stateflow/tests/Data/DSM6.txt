@@ -86,7 +86,7 @@ endmodule
 
 module data_ctrl():
 begin
-  myglobal := [0,0];
+  myglobal := [0, 0];
   {
     myglobal_in!myglobal -->
       skip; $

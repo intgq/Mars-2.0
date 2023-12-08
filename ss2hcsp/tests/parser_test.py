@@ -131,28 +131,44 @@ class ParserTest(unittest.TestCase):
         ))
 
     def testQuantifierExpr(self):
-        exprs = [expr_parser.parse("\\forall x. x != 0 -> 1/x != 0"),
-                 expr_parser.parse("\\forall {x, y}. x^2 + y^2 >= 0"),
-                 expr_parser.parse("\\exists x. x > 0 -> x * y^2 == 1"),
-                 expr_parser.parse("\\exists {x, y}. x^2 + y^2 == 0"),
-                 expr_parser.parse("\\forall x. \\exists y. x > 0 -> x * y^2 == 1"),
-                 expr_parser.parse("\\exists y. \\forall x. x > 0 -> x * y^2 == 1"),
-                 expr_parser.parse("\\forall x. \\forall y. x^2 + y^2 >= 0")]
+        test_data = [
+            "forall x. x != 0 -> 1 / x != 0",
+            "forall {x, y}. x^2 + y^2 >= 0",
+            "exists x. x > 0 -> x * y^2 == 1",
+            "exists {x, y}. x^2 + y^2 == 0",
+            "forall x. exists y. x > 0 -> x * y^2 == 1",
+            "exists y. forall x. x > 0 -> x * y^2 == 1",
+            "forall x. forall y. x^2 + y^2 >= 0",
+        ]
 
-        for expr in exprs:
-            print(expr) 
+        for s in test_data:
+            e = expr_parser.parse(s)
+            self.assertEqual(str(e), s)
 
     def testNotExpr(self):
-        exprs = [expr_parser.parse("!(x >= 0)")]
+        test_data = [
+            "!x >= 0",
+        ]
 
-        for expr in exprs:
-            print(expr)   
+        for s in test_data:
+            e = expr_parser.parse(s)
+            self.assertEqual(str(e), s)
 
     def testODE(self):
-        odes = ["{x_dot = 1 & true} solution;"]
+        # TODO: print solution tactic
+        ode = "{x_dot = 1 & true} solution;"
 
-        for ode in odes:
-            print(hp_parser.parse(ode)) 
+        hp = hp_parser.parse(ode)
+        self.assertEqual(str(hp), "{x_dot = 1 & true}")
+
+    def testArrayIdxExpr(self):
+        test_data = [
+            "[1, 2, 3][0]",
+        ]
+
+        for s in test_data:
+            e = expr_parser.parse(s)
+            self.assertEqual(str(e), s)
 
 
 if __name__ == "__main__":

@@ -1,69 +1,57 @@
 """Optimization of HCSP code."""
 
+from typing import Dict, Optional, Set
 from ss2hcsp.hcsp import expr
 from ss2hcsp.hcsp import hcsp
-from ss2hcsp.hcsp import simulator
+from ss2hcsp.hcsp.hcsp import HCSP
 
 
-def is_atomic(hp):
+def is_atomic(hp: HCSP) -> bool:
     """Whether hp is an atomic program"""
-    return hp.type in ('skip', 'wait', 'assign', 'assert', 'test', 'log',
+    return hp.type in ('skip', 'wait', 'assert', 'test', 'log',
                        'input_channel', 'output_channel', 'ode')
 
-def simplify_expr(e):
-    assert isinstance(e, expr.Expr)
-    if not e.get_vars():
-        b = simulator.eval_expr(e, dict())
-        assert isinstance(b, bool)
-        return expr.true_expr if b else expr.false_expr
-    elif isinstance(e, expr.LogicExpr):
-        if e.op == '&&':
-            return expr.conj(*(simplify_expr(arg) for arg in e.exprs))
-        elif e.op == '||':
-            return expr.disj(*(simplify_expr(arg) for arg in e.exprs))
-        elif e.op == '->':
-            return expr.imp(simplify_expr(e.exprs[0]), simplify_expr(e.exprs[1]))
-        else:
-            return e
-    else:
-        return e
-
-def simplify(hp):
+def simplify(hp: HCSP) -> HCSP:
     """Perform immediate simplifications to HCSP process. This includes:
     
     * Remove extraneous skip from processes.
     * Simplify if true then P else Q to P.
     
     """
-    if is_atomic(hp) or hp.type == 'var':
+    if is_atomic(hp) or isinstance(hp, hcsp.Var):
         return hp
-    elif hp.type == 'sequence':
+    elif isinstance(hp, hcsp.Assign):
+        return hcsp.Assign(hp.var_name, hp.expr.simplify())
+    elif isinstance(hp, hcsp.Sequence):
         return hcsp.seq([simplify(sub_hp) for sub_hp in hp.hps])
-    elif hp.type == 'loop':
-        return hcsp.Loop(simplify(hp.hp), constraint=hp.constraint)
-    elif hp.type == 'ode':
-        return hcsp.ODE(hp.eqs, simplify(hp.constraint), out_hp=simplify(hp.out_hp))
-    elif hp.type == 'ode_comm':
-        return hcsp.ODE_Comm(hp.eqs, hp.constraint,
+    elif isinstance(hp, hcsp.Loop):
+        return hcsp.Loop(simplify(hp.hp), constraint=hp.constraint.simplify())
+    elif isinstance(hp, hcsp.ODE):
+        print("here")
+        return hcsp.ODE([(v, v_dot.simplify()) for v, v_dot in hp.eqs],
+                        hp.constraint.simplify(), out_hp=simplify(hp.out_hp))
+    elif isinstance(hp, hcsp.ODE_Comm):
+        return hcsp.ODE_Comm([(v, v_dot.simplify()) for v, v_dot in hp.eqs],
+                             hp.constraint.simplify(),
                              [(io, simplify(comm_hp)) for io, comm_hp in hp.io_comms])
-    elif hp.type == 'select_comm':
+    elif isinstance(hp, hcsp.SelectComm):
         return hcsp.SelectComm(*((io, simplify(comm_hp)) for io, comm_hp in hp.io_comms))
-    elif hp.type == 'ite':
+    elif isinstance(hp, hcsp.ITE):
         new_if_hps = []
         for cond, if_hp in hp.if_hps:
-            simp_cond = simplify_expr(cond)
+            simp_cond = cond.simplify()
             simp_if_hp = simplify(if_hp)
-            if simp_if_hp.type == 'skip' or simp_cond == expr.false_expr:
+            if isinstance(simp_if_hp, hcsp.Skip) or simp_cond == expr.false_expr:
                 continue
             elif simp_cond == expr.true_expr:
                 if len(new_if_hps) > 0:
                     return hcsp.ite(new_if_hps, simp_if_hp)
                 else:
                     return simp_if_hp
-            elif simp_if_hp.type == 'ite' and simp_if_hp.if_hps[0][0] == simp_cond:
+            elif isinstance(simp_if_hp, hcsp.ITE) and simp_if_hp.if_hps[0][0] == simp_cond:
                 simp_if_hp = simp_if_hp.if_hps[0][1]
-            elif simp_if_hp.type == 'sequence' and simp_if_hp.hps[0].type == 'ite' \
-                and simp_if_hp.hps[0].if_hps[0][0] == simp_cond:
+            elif isinstance(simp_if_hp, hcsp.Sequence) and isinstance(simp_if_hp.hps[0], hcsp.ITE) and \
+                simp_if_hp.hps[0].if_hps[0][0] == simp_cond:
                 simp_if_hp = hcsp.Sequence(simp_if_hp.hps[0].if_hps[0][1], *simp_if_hp.hps[1:])
             new_if_hps.append((simp_cond, simp_if_hp))
         if hp.else_hp is None:
@@ -217,7 +205,7 @@ def get_write_vars_val(hp, var):
 def targeted_replace(hp, repls):
     """Make the given list of replacements."""
     def rec(hp, cur_pos):
-        if is_atomic(hp):
+        if is_atomic(hp) or isinstance(hp, hcsp.Assign):
             if cur_pos in repls:
                 return replace_read_vars(hp, repls[cur_pos])
             else:
@@ -266,7 +254,7 @@ def targeted_remove(hp, remove_locs):
 
     """
     def rec(hp, cur_pos):
-        if is_atomic(hp):
+        if is_atomic(hp) or isinstance(hp, hcsp.Assign):
             if cur_pos in remove_locs:
                 return hcsp.Skip()
             else:
@@ -329,7 +317,7 @@ class LocationInfo:
     def __str__(self):
         lines = []
         lines.append("Location %s" % str(self.loc))
-        if is_atomic(self.sub_hp):
+        if is_atomic(self.sub_hp) or isinstance(self.sub_hp, hcsp.Assign):
             lines.append("  Code: %s" % str(self.sub_hp))
         lines.append("  Edges: %s" % (', '.join(str(edge) for edge in self.edges)))
         lines.append("  Edges (rev): %s" % (', '.join(str(edge) for edge in self.rev_edges)))
@@ -340,7 +328,7 @@ class LocationInfo:
 
 
 class HCSPAnalysis:
-    def __init__(self, hp, *, local_vars=None):
+    def __init__(self, hp: HCSP, *, local_vars: Optional[Set[str]] = None):
         self.hp = hp
         if local_vars is None:
             local_vars = set()
@@ -363,7 +351,7 @@ class HCSPAnalysis:
             if cur_pos not in self.infos:
                 self.infos[cur_pos] = LocationInfo(cur_pos, hp)
 
-            if is_atomic(hp) or hp.type == 'var':
+            if is_atomic(hp) or isinstance(hp, (hcsp.Var, hcsp.Assign)):
                 self.infos[cur_pos].exits.append(cur_pos)
 
             elif hp.type == 'sequence':
@@ -492,7 +480,7 @@ class HCSPAnalysis:
         """
         repls = dict()
         for loc, info in self.infos.items():
-            if is_atomic(info.sub_hp) or info.sub_hp.type in ('ite'):   
+            if is_atomic(info.sub_hp) or isinstance(info.sub_hp, (hcsp.Assign, hcsp.ITE)):   
                 for var in get_read_vars(info.sub_hp):
                     # Count number of occurrences in var
                     reach_defs = [prev_val for prev_var, prev_val in info.reach_before
@@ -542,7 +530,7 @@ class HCSPAnalysis:
 
         # Live variables for commands
         for loc, info in self.infos.items():
-            if is_atomic(info.sub_hp) or info.sub_hp.type in ('ite'):
+            if is_atomic(info.sub_hp) or isinstance(info.sub_hp, (hcsp.Assign, hcsp.ITE)):   
                 for var in get_read_vars(info.sub_hp):
                     self.infos[loc].live_before.add(var)
         
@@ -580,11 +568,15 @@ class HCSPAnalysis:
         return dead_code
 
 
-def full_optimize(hp, *, local_vars=None):
+def full_optimize(hp: HCSP, *, local_vars: Optional[Set[str]] = None) -> HCSP:
     """Full optimization of a single HCSP program.
 
-    hp : HCSP - program to be optimized.
-    local_vars : set[str] - list of local variables.
+    Parameters
+    ----------
+    hp : HCSP
+        program to be optimized.
+    local_vars : Optional[Set[str]]
+        list of local variables.
 
     """
     while True:
@@ -609,13 +601,19 @@ def full_optimize(hp, *, local_vars=None):
             break
     return hp
 
-def full_optimize_module(procs, hp, *, local_vars=None, local_vars_proc=None):
+def full_optimize_module(procs: Dict[str, HCSP], hp: HCSP, *,
+                         local_vars: Optional[Set[str]] = None,
+                         local_vars_proc: Optional[Set[str]] = None):
     """Full optimization of a single HCSP program, along with procedures.
 
-    hp : HCSP - program to be optimized.
-    procs : dict[str, HCSP] - dictionary of procedures.
-    local_vars : set[str] - list of local variables in hp.
-    local_vars_proc : set[str] - list of local variables in procs.
+    hp : HCSP
+        program to be optimized.
+    procs : Dict[str, HCSP]
+        dictionary of procedures.
+    local_vars : Optional[Set[str]]
+        list of local variables in hp.
+    local_vars_proc : Optional[Set[str]]
+        list of local variables in procs.
 
     """
     while True:

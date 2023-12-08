@@ -19,7 +19,7 @@ end
 
 begin
   ChartEL := [];
-  a := [0,0,1,2];
+  a := [0, 0, 1, 2];
   N := 4;
   Chart_st := "Chart_A";
   s := "en_A";

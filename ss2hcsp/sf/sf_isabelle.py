@@ -441,7 +441,7 @@ def translate_composition_function(ssid, diagram):
     name = 'f_' + state.get_state_whole_name()
     fun_str = 'definition %s :: string2state where \n' %name
     def_str = ('%s_def' % name)
-    fun_str += '\" %s = \n(λstr. ' %name
+    fun_str += '\" %s = \n(\\<lambda>str. ' %name
     for child in state.children:
         if not isinstance(child, Junction):
             child_name = child.get_state_whole_name()
@@ -452,7 +452,7 @@ def translate_composition_function(ssid, diagram):
 #translate functions for junction to get its transition list
 def translate_junction_function(diagram):
     fun_str = 'definition g :: juncs where \n'
-    fun_str += '\" g = (λ str. '
+    fun_str += '\" g = (\\<lambda>str. '
     for ssid, state in diagram.all_states.items():
         if isinstance(state, Junction):
             junc_path = get_state_path(state)

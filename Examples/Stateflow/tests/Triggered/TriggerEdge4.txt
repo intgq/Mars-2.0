@@ -78,32 +78,32 @@ begin
   Pulse_Generator1_tick := 0;
   Pulse_Generator2_tick := 0;
   Pulse_Generator3_tick := 0;
-  pre_d := [0,0,0,0];
+  pre_d := [0, 0, 0, 0];
   a := 0;
   tt := 0;
   {
     if (Pulse_Generator_tick % 10 >= 1 && Pulse_Generator_tick % 10 < 2) {
-      x := 1.0;
+      x := 1;
     } else {
-      x := 0.0;
+      x := 0;
     }
     Pulse_Generator_tick := Pulse_Generator_tick + 1;
     if (Pulse_Generator1_tick % 10 >= 8 && Pulse_Generator1_tick % 10 < 9) {
-      y := 1.0;
+      y := 1;
     } else {
-      y := 0.0;
+      y := 0;
     }
     Pulse_Generator1_tick := Pulse_Generator1_tick + 1;
     if (Pulse_Generator2_tick % 10 >= 3 && Pulse_Generator2_tick % 10 < 4) {
-      z := 1.0;
+      z := 1;
     } else {
-      z := 0.0;
+      z := 0;
     }
     Pulse_Generator2_tick := Pulse_Generator2_tick + 1;
     if (Pulse_Generator3_tick % 10 >= 5 && Pulse_Generator3_tick % 10 < 6) {
-      w := 1.0;
+      w := 1;
     } else {
-      w := 0.0;
+      w := 0;
     }
     Pulse_Generator3_tick := Pulse_Generator3_tick + 1;
     b := push(x,y);

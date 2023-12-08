@@ -1,9 +1,9 @@
 """Modules for hybrid programs"""
 
 import os
-from typing import List, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
-from ss2hcsp.hcsp.hcsp import HCSPInfo, Procedure, HCSP
+from ss2hcsp.hcsp.hcsp import HCSPInfo, HCSPOutput, Procedure, HCSP
 from ss2hcsp.hcsp import pprint
 from ss2hcsp.hcsp import expr
 
@@ -24,8 +24,12 @@ class HCSPModule:
     code: code (template) for the main process.
     
     """
-    def __init__(self, name: str, code: Union[str, HCSP], *, params=None,
-                 outputs=None, procedures=None, meta=None):
+    def __init__(self, name: str,
+                 code: Union[str, HCSP], *,
+                 params=None,
+                 outputs: Optional[Iterable[HCSPOutput]] = None,
+                 procedures=None,
+                 meta=None):
         self.name = name
         if params is None:
             params = tuple()
@@ -43,7 +47,7 @@ class HCSPModule:
         self.meta = meta
 
     def __eq__(self, other):
-        return self.name == other.name and self.params == other.params and \
+        return isinstance(other, HCSPModule) and self.name == other.name and self.params == other.params and \
             self.outputs == other.outputs and self.procedures == other.procedures and \
             self.code == other.code
 
@@ -186,8 +190,7 @@ try:
         for line in f.readlines():
             hcsp_import_path.append(os.path.abspath(line.strip()))
 except FileNotFoundError:
-    pass
-    # print('Warning: import_path.txt not found.')
+    print('Warning: import_path.txt not found.')
 
 def read_file(filename):
     """Given file name, attempt to locate the file in the import paths

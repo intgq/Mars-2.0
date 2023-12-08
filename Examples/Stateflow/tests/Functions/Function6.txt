@@ -3,8 +3,8 @@
 module Chart():
 begin
   ChartEL := [];
-  a := [0,0,0,0];
-  b := [0,1,2,3];
+  a := [0, 0, 0, 0];
+  b := [0, 1, 2, 3];
   Chart_st := "Chart_A";
   s := "en_A";
   log("en_A" + "\n");

@@ -12,9 +12,9 @@ static Channel channel;
 static Channel channels[1];
 static double h = step_size;
 static double* midDouble = NULL;
-	static double data = 0.0;
 	static double slope = 0.0;
 	static double t = 0.0;
+	static double data = 0.0;
 
 void* radar (void* arg) {
     threadNumber = (int)(*((int*)arg));

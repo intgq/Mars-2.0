@@ -12,14 +12,14 @@ static Channel channel;
 static Channel channels[8];
 static double h = step_size;
 static double* midDouble = NULL;
-	static double t = 0.0;
-	static String state;
-	static double entered = 0.0;
 	static double processing_state = 0.0;
-	static double c = 0.0;
-	static double image = 0.0;
+	static double entered = 0.0;
 	static double new_image = 0.0;
+	static double c = 0.0;
 	static double prior = 0.0;
+	static String state;
+	static double image = 0.0;
+	static double t = 0.0;
 
 void* img_acq (void* arg) {
     threadNumber = (int)(*((int*)arg));

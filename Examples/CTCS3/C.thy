@@ -577,7 +577,7 @@ proof -
         using 2
         unfolding fs_def Let_def apply auto
         subgoal using assms(1) fs_at_most_limit A_minus Period 
-          by (smt mult_diff_mult real_mult_less_iff1)
+          by (smt mult_diff_mult mult_less_iff1)
         subgoal premises pre
         proof-
           have "v^2 \<le> 2 * A_minus * (Stop_point - s)"
@@ -606,7 +606,7 @@ proof -
         using 2
         unfolding fs_def Let_def apply auto
         subgoal using assms(1) fs_at_most_limit A_minus Period 
-          by (smt mult_diff_mult real_mult_less_iff1)
+          by (smt mult_diff_mult mult_less_iff1)
         subgoal 
           apply(subgoal_tac "s + v * Period - A_minus * Period\<^sup>2 / 2  \<le> s")
            prefer 2 subgoal

@@ -12,10 +12,10 @@ static Channel channel;
 static Channel channels[3];
 static double h = step_size;
 static double* midDouble = NULL;
-	static double data = 0.0;
 	static double error = 0.0;
-	static double t = 0.0;
 	static double x = 0.0;
+	static double data = 0.0;
+	static double t = 0.0;
 
 void* laser (void* arg) {
     threadNumber = (int)(*((int*)arg));

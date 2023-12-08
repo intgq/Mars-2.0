@@ -21,8 +21,7 @@ class Mux(SL_Block):
     def get_expr(self):
         """Compute the assignment corresponding to a mux block."""
         in_vars = [line.name for line in self.dest_lines]
-        e = ListExpr(*(AVar(var) for var in in_vars))
-        return e
+        return FunExpr("mux", [AVar(var) for var in in_vars])
 
     def get_output_hp(self):
         out_var = self.src_lines[0][0].name
@@ -31,7 +30,7 @@ class Mux(SL_Block):
         e = AVar(in_vars[0])
         for i in range(1, len(in_vars)):
             e = FunExpr("push", [e, AVar(in_vars[i])])
-        return hp.Assign(out_var, e)
+        return hp.Assign(out_var, e)        
 
     def get_var_subst(self):
         expr = self.get_expr()

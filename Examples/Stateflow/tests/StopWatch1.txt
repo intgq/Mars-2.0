@@ -151,7 +151,7 @@ begin
   Chart_RunW_st := "";
   Chart_st := "Chart_StopW";
   Chart_StopW_st := "Chart_StopW_Reset";
-  pre_x0 := [0,0,0];
+  pre_x0 := [0, 0, 0];
   disp_cent := 0;
   Pulse_Generator2_tick := 0;
   Signal_Builder_tick := 0;
@@ -159,9 +159,9 @@ begin
   tt := 0;
   {
     if (Pulse_Generator2_tick % 2 >= 0 && Pulse_Generator2_tick % 2 < 1) {
-      tick := 1.0;
+      tick := 1;
     } else {
-      tick := 0.0;
+      tick := 0;
     }
     Pulse_Generator2_tick := Pulse_Generator2_tick + 1;
     if (_tick % 10 == 0) {

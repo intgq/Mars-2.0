@@ -1,20 +1,27 @@
 """Translation from diagrams to HCSP processes."""
 
 from decimal import Decimal
+from typing import Dict, List
 
 from ss2hcsp.hcsp import hcsp as hp
-from ss2hcsp.hcsp.expr import AConst, AVar, OpExpr, RelExpr, true_expr, subst_all, conj, neg_expr, ListExpr
-from ss2hcsp.sl.sl_block import get_gcd
+from ss2hcsp.hcsp.expr import Expr, AConst, AVar, OpExpr, RelExpr, FunExpr, true_expr, subst_all, conj, neg_expr, ListExpr
+from ss2hcsp.sl.sl_block import get_gcd, SL_Block
 from ss2hcsp.hcsp.module import HCSPModule
 from ss2hcsp.hcsp import hcsp
 from ss2hcsp.sf import sf_convert
+from ss2hcsp.sf.sf_chart import SF_Chart
 from ss2hcsp.hcsp.optimize import full_optimize_module
 from ss2hcsp.sl.sl_diagram import SL_Diagram
+from ss2hcsp.sl.Continuous.integrator import Integrator
+from ss2hcsp.sl.Discontinuities.hitcross import Hitcross
+from ss2hcsp.sl.Continuous.transferfcn import TransferFcn
+from ss2hcsp.sl.SubSystems.subsystem import Triggered_Subsystem
 
 
-def translate_discrete(diagram, chart_parameters):
+def translate_discrete(diagram: List[SL_Block], chart_parameters):
     """Obtain procedures for the discrete part of the diagram."""
-    assert isinstance(diagram, list)  # diagram is a list of blocks
+    assert all(isinstance(block, SL_Block) for block in diagram)
+
     sample_time = get_gcd([block.st for block in diagram
                           if isinstance(block.st, (int, Decimal)) and block.st > 0])
     block_dict = {block.name: block for block in diagram}
@@ -108,14 +115,10 @@ def translate_discrete(diagram, chart_parameters):
             output_hps.append(hp.ITE([(
                 RelExpr("==", OpExpr("%", AVar("_tick"), AConst(period)), AConst(0)),
                 block.get_output_hp())]))
-            
-
-
 
         # change it to check if have get_update_up func
         if block.type == "unit_delay":
-        ##############################
-            
+        ##############################            
             if block.st == sample_time:
                 update_hps.append(block.get_update_hp())
             else:
@@ -124,15 +127,24 @@ def translate_discrete(diagram, chart_parameters):
                 update_hps.append(hp.ITE([(
                     RelExpr("==", OpExpr("%", AVar("_tick"), AConst(period)), AConst(0)),
                     block.get_update_hp())]))
+        elif isinstance(block, SF_Chart):
+            for id, v in block.port_to_out_var.items():
+                out_var = block.src_lines[id][0].name
+                if out_var != v:
+                    update_hps.append(hp.Assign(AVar(out_var), AVar(v)))
     return init_hps, procedures, output_hps, update_hps, sample_time
 
 
-def translate_continuous(diagram):
-    """Translate continuous diagram.
+def translate_continuous(diagram: List[SL_Block]):
+    """Translate the continuous part of the diagram.
 
-    diagram : SL_Diagram
+    Parameters
+    ----------
+    diagram : List[SL_Block]
+        Continuous blocks in the diagram
 
-    Returns five-tuple:
+    Returns
+    -------
     init_hps: initialization processes.
     equations: equations of the ODE.
     constraints: constraint of the ODE.
@@ -149,34 +161,38 @@ def translate_continuous(diagram):
 
     # Dictionary of variable substitutions. There should be no loops
     # in substitution.
-    var_subst = dict()
+    var_subst: Dict[str, Expr] = dict()
 
     for block in diagram:
         if block.type in ('add', 'product', 'bias', 'gain', 'constant', 'square', 'relation',
-                          'sqrt', 'switch', 'sine', 'fcn', 'mux', 'selector', 'saturation','hitcross'):
+                          'sqrt', 'switch', 'sine', 'fcn', 'mux', 'selector', 'saturation'):
             var_subst.update(block.get_var_subst())
-        elif block.type == "integrator":
+        elif isinstance(block, Integrator):
             in_var = block.dest_lines[0].name
             out_var = block.src_lines[0][0].name
             init_hps.append(hp.Assign(out_var, AConst(block.init_value)))
             equations.append((out_var, AVar(in_var)))
             if block.enable != true_expr:
                 constraints.append(block.enable)
-        elif block.type == "transfer_fcn":
+        elif isinstance(block, TransferFcn):
             in_var = block.dest_lines[0].name
             out_var = block.src_lines[0][0].name
             init_hps.append(hp.Assign(out_var, AConst(0)))
             coeff = AConst(block.get_coeff())
-            equations.append((out_var, OpExpr("-", OpExpr("*", coeff, AVar(in_var)), OpExpr("*", coeff, AVar(out_var)))))
+            equations.append((out_var, OpExpr("-", OpExpr("*", coeff, AVar(in_var)),
+                                              OpExpr("*", coeff, AVar(out_var)))))
             if block.enable != true_expr:
                 constraints.append(block.enable)
-        elif block.type == "triggered_subsystem":
+        elif isinstance(block, Triggered_Subsystem):
             init_hps.extend(block.get_init_hps())
             init_hps.append(hp.Assign(block.triggered, AConst(0)))
             trig_cond = block.get_continuous_triggered_condition()
             trig_procs.append((trig_cond, hp.Var(block.name)))
             constraints.append(neg_expr(trig_cond))
             procedures.extend(block.get_procedures())
+        elif isinstance(block, Hitcross):
+            init_hps.append(block.get_init_hp())
+            var_subst.update(block.get_var_subst())
         elif block.type in ('scope', 'in_port', 'out_port'):  # ignore
             pass
         else:
@@ -184,13 +200,13 @@ def translate_continuous(diagram):
 
     # Perform some pre-processing: first substitute the lists
     for name, e in var_subst.items():
-        if isinstance(e, ListExpr):
+        if isinstance(e, ListExpr) or isinstance(e, FunExpr) and e.fun_name == "mux":
             for name2, e2 in var_subst.items():
                 var_subst[name2] = e2.subst({name: e}).simplify()
 
     for i in range(len(equations)):
         var, e = equations[i]
-        equations[i] = (var, subst_all(e, var_subst))
+        equations[i] = (var, subst_all(e, var_subst).simplify())
 
     return init_hps, equations, var_subst, constraints, trig_procs, procedures
 
@@ -245,6 +261,13 @@ def get_hcsp(diagram: SL_Diagram):
         trig_proc = hp.Sequence(*trig_proc) if len(trig_proc) >= 2 else trig_proc[0]
         continuous_hp = hp.Loop(hp=hp.Sequence(continuous_hp, trig_proc), constraint=time_constraint)
 
+    # Update hitcross variables
+    update_hp = list()
+    for block in diagram.continuous_blocks:
+        if isinstance(block, Hitcross):
+            update_hp.append(block.get_init_hp())
+    update_hp = hp.seq(update_hp)
+
     # Update t := t + tt
     update_t = hp.Assign("t", OpExpr("+", AVar("t"), AVar("tt")))
 
@@ -255,9 +278,9 @@ def get_hcsp(diagram: SL_Diagram):
     reset_tt = hp.Assign(var_name="tt", expr=AConst(0))
 
     if names_triggered:
-        continuous_hp = hp.Sequence(names_triggered, continuous_hp, update_t, update_tick, reset_tt)
+        continuous_hp = hp.Sequence(names_triggered, update_hp, continuous_hp, update_t, update_tick, reset_tt)
     else:
-        continuous_hp = hp.Sequence(continuous_hp, update_t, update_tick, reset_tt)
+        continuous_hp = hp.Sequence(update_hp, continuous_hp, update_t, update_tick, reset_tt)
 
     # Main process
     main_hp = hp.Sequence(init_hp, hp.Loop(hp.Sequence(discrete_hp, continuous_hp)))
@@ -273,7 +296,7 @@ def get_hcsp(diagram: SL_Diagram):
     for scope in diagram.scopes:
         in_vars = [line.name for line in scope.dest_lines]
         for in_var in in_vars:
-            subst_e = hp.subst_all(AVar(in_var), var_subst)
+            subst_e = hp.subst_all(AVar(in_var), var_subst).simplify()
             if subst_e == AVar(in_var):
                 outputs.append(hp.HCSPOutput(in_var))
             else:

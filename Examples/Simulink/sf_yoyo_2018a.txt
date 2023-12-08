@@ -1,0 +1,160 @@
+%type: module
+
+module P():
+output x4 = l * 9.8 * (1 - cos(theta)) + 0.5 * l * l * theta_dot * theta_dot, l, theta;
+procedure exec_Chart begin
+  Chart_done := 0;
+  Chart_ret := 0;
+  if (Chart_st == "Chart_Active") {
+    Chart_Active_done := 0;
+    if (len(ChartEL) != 0 && top(ChartEL) == "EnergyLow") {
+      if (Chart_st == "Chart_Active") {
+        if (Chart_Active_st == "Chart_Active_ReelMoving") {
+          if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelOut") {
+            Chart_Active_ReelMoving_st := "";
+          } else if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelIn") {
+            Chart_Active_ReelMoving_st := "";
+          }
+          ReelState := 0;
+          if (Chart_Active_st == "Chart_Active_ReelMoving") {
+            Chart_Active_st := "";
+          }
+        } else if (Chart_Active_st == "Chart_Active_ReelStop") {
+          Chart_Active_st := "";
+        }
+        if (Chart_st == "Chart_Active") {
+          Chart_st := "";
+        }
+        if (Chart_st == "") {
+          Chart_st := "Chart_Inactive";
+        }
+        Chart_Active_done := 1;
+      }
+    }
+    Chart_ret := Chart_Active_done;
+    if (Chart_ret == 0) {
+      if (Chart_Active_st == "Chart_Active_ReelMoving") {
+        Chart_Active_ReelMoving_done := 0;
+        Chart_ret := 0;
+        if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelOut") {
+          Chart_Active_ReelMoving_ReelOut_done := 0;
+          if (len(ChartEL) != 0 && top(ChartEL) == "Lmax") {
+            if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelOut") {
+              Chart_Active_ReelMoving_st := "";
+              ReelState := 0;
+              if (Chart_Active_st == "Chart_Active_ReelMoving") {
+                Chart_Active_st := "";
+              }
+              if (Chart_Active_st == "" && Chart_st == "Chart_Active") {
+                Chart_Active_st := "Chart_Active_ReelStop";
+              }
+              Chart_Active_ReelMoving_ReelOut_done := 1;
+            }
+          }
+          Chart_ret := Chart_Active_ReelMoving_ReelOut_done;
+        } else if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelIn") {
+          Chart_Active_ReelMoving_ReelIn_done := 0;
+          if (len(ChartEL) != 0 && top(ChartEL) == "Lmin") {
+            if (Chart_Active_ReelMoving_st == "Chart_Active_ReelMoving_ReelIn") {
+              Chart_Active_ReelMoving_st := "";
+              ReelState := 0;
+              if (Chart_Active_st == "Chart_Active_ReelMoving") {
+                Chart_Active_st := "";
+              }
+              if (Chart_Active_st == "" && Chart_st == "Chart_Active") {
+                Chart_Active_st := "Chart_Active_ReelStop";
+              }
+              Chart_Active_ReelMoving_ReelIn_done := 1;
+            }
+          }
+          Chart_ret := Chart_Active_ReelMoving_ReelIn_done;
+        }
+      } else if (Chart_Active_st == "Chart_Active_ReelStop") {
+        Chart_Active_ReelStop_done := 0;
+        if (len(ChartEL) != 0 && top(ChartEL) == "ThetaZero") {
+          if (Chart_Active_st == "Chart_Active_ReelStop") {
+            Chart_Active_st := "";
+            if (Chart_st == "Chart_Active") {
+              Chart_Active_st := "Chart_Active_ReelMoving";
+              Chart_Active_ReelMoving_st := "Chart_Active_ReelMoving_ReelOut";
+              ReelState := 1;
+            }
+            Chart_Active_ReelStop_done := 1;
+          }
+        }
+        if (Chart_Active_st == "Chart_Active_ReelStop" && Chart_Active_ReelStop_done == 0 && len(ChartEL) != 0 && top(ChartEL) == "ThetaDotZero") {
+          if (Chart_Active_st == "Chart_Active_ReelStop") {
+            Chart_Active_st := "";
+            if (Chart_st == "Chart_Active") {
+              Chart_Active_st := "Chart_Active_ReelMoving";
+              Chart_Active_ReelMoving_st := "Chart_Active_ReelMoving_ReelIn";
+              ReelState := -1;
+            }
+            Chart_Active_ReelStop_done := 1;
+          }
+        }
+        Chart_ret := Chart_Active_ReelStop_done;
+      }
+    }
+  } else if (Chart_st == "Chart_Inactive") {
+    Chart_Inactive_done := 0;
+    Chart_ret := 0;
+  }
+end
+
+begin
+  t := 0;
+  _tick := 0;
+  ChartEL := [];
+  Chart_Active_ReelMoving_st := "";
+  ReelState := 0;
+  Chart_st := "Chart_Active";
+  Chart_Active_st := "Chart_Active_ReelStop";
+  pre_x0 := [0, 0, 0, 0, 0];
+  x1 := 0;
+  tt := 0;
+  l := 100;
+  theta := 0.16;
+  theta_dot := 0;
+  ThetaDotZero_state := 0;
+  ThetaZero_state := 0.16;
+  {
+    if (pre_x0[0] <= 0 && (if ThetaDotZero_state <= 0 && theta_dot > 0 || ThetaDotZero_state > 0 && theta_dot <= 0 then 1 else 0) > 0 || pre_x0[0] > 0 && (if ThetaDotZero_state <= 0 && theta_dot > 0 || ThetaDotZero_state > 0 && theta_dot <= 0 then 1 else 0) <= 0) {
+      ChartEL := push(ChartEL,"ThetaDotZero");
+      @exec_Chart;
+      ChartEL := pop(ChartEL);
+    }
+    if (pre_x0[1] <= 0 && (if ThetaZero_state <= 0 && theta > 0 || ThetaZero_state > 0 && theta <= 0 then 1 else 0) > 0 || pre_x0[1] > 0 && (if ThetaZero_state <= 0 && theta > 0 || ThetaZero_state > 0 && theta <= 0 then 1 else 0) <= 0) {
+      ChartEL := push(ChartEL,"ThetaZero");
+      @exec_Chart;
+      ChartEL := pop(ChartEL);
+    }
+    if (pre_x0[2] <= 0 && (l * 9.8 * (1 - cos(theta)) + 0.5 * l * l * theta_dot * theta_dot <= 0.001) > 0 || pre_x0[2] > 0 && (l * 9.8 * (1 - cos(theta)) + 0.5 * l * l * theta_dot * theta_dot <= 0.001) <= 0) {
+      ChartEL := push(ChartEL,"EnergyLow");
+      @exec_Chart;
+      ChartEL := pop(ChartEL);
+    }
+    if (pre_x0[3] <= 0 && (l <= 95) > 0 || pre_x0[3] > 0 && (l <= 95) <= 0) {
+      ChartEL := push(ChartEL,"Lmin");
+      @exec_Chart;
+      ChartEL := pop(ChartEL);
+    }
+    if (pre_x0[4] <= 0 && (l >= 105) > 0 || pre_x0[4] > 0 && (l >= 105) <= 0) {
+      ChartEL := push(ChartEL,"Lmax");
+      @exec_Chart;
+      ChartEL := pop(ChartEL);
+    }
+    pre_x0 := [(if ThetaDotZero_state <= 0 && theta_dot > 0 || ThetaDotZero_state > 0 && theta_dot <= 0 then 1 else 0), (if ThetaZero_state <= 0 && theta > 0 || ThetaZero_state > 0 && theta <= 0 then 1 else 0), l * 9.8 * (1 - cos(theta)) + 0.5 * l * l * theta_dot * theta_dot <= 0.001, l <= 95, l >= 105];
+    x1 := ReelState;
+    ThetaDotZero_state := theta_dot;
+    ThetaZero_state := theta;
+    {tt_dot = 1, l_dot = x1 * 20, theta_dot = theta_dot, theta_dot_dot = -((2 * (x1 * 20) * theta_dot + 9.8 * sin(theta)) / l) & tt < 1}
+    t := t + tt;
+    _tick := _tick + 1;
+    tt := 0;
+  }*
+end
+endmodule
+system
+  P=P()
+endsystem

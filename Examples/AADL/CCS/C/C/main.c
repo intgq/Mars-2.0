@@ -18,7 +18,7 @@
 #include "velo_voter_imp.h"
 #include "img_acq_imp.h"
 
-// Global clock (s)
+// Global clock (ms)
 int globalClock = 0;
 
 // Shared variables
@@ -89,6 +89,7 @@ static void camera_data(void) {
 
 // produce_data of radar
 static void radar_data(void) {
+/*
   if (globalClock < 6000)
     obs_pos_radar = 0.0;
   else if (globalClock < 10000)
@@ -97,6 +98,13 @@ static void radar_data(void) {
     obs_pos_radar = 0.0;
   else
     obs_pos_radar = 45.0;
+*/
+  if (globalClock < 10000)
+    obs_pos_radar = 0.0;
+  else if (globalClock < 20000)
+    obs_pos_radar = compute_value(10000, 20000, 35, 55, globalClock);
+  else
+    obs_pos_radar = 0.0;
 }
 
 // produce_data of actuator
@@ -123,6 +131,7 @@ static void wheel_data() {
 
 // produce_data of user_panel
 static void user_panel_event() {
+/*
   if (globalClock < 1) {
     for (int count = 0; count < 5; count++)
       enqueue(&inc_buffer, '+');
@@ -131,6 +140,11 @@ static void user_panel_event() {
     for (int count = 0; count < 2; count++)
       enqueue(&dec_buffer, '-');
   }
+*/
+  if (globalClock == 0 || globalClock == 500 || globalClock == 1000)
+    enqueue(&inc_buffer, '+');
+  else if (globalClock == 30000)
+    enqueue(&dec_buffer, '-');
 }
 
 Device camera = {"camera", 200, camera_data};
@@ -171,12 +185,16 @@ void trig_pan_ctr_th() {
   }
 }
 
-Thread img_acq = {0, 0, 0, "img_acq", 50, 1, 50, "inactive", "periodic", 10, 40, img_acq_imp_initialize, img_acq_imp_step, img_acq_imp_finalize};
-Thread comp_obs_pos = {1, 0, 0, "comp_obs_pos", 100, 1, 100, "inactive", "periodic", 20, 50, comp_obs_pos_imp_initialize, comp_obs_pos_imp_step, comp_obs_pos_imp_finalize};
+// Thread img_acq = {0, 0, 0, "img_acq", 50, 1, 50, "inactive", "periodic", 10, 40, img_acq_imp_initialize, img_acq_imp_step, img_acq_imp_finalize};
+Thread img_acq = {0, 0, 0, "img_acq", 45, 1, 45, "inactive", "periodic", 10, 10, img_acq_imp_initialize, img_acq_imp_step, img_acq_imp_finalize};
+// Thread comp_obs_pos = {1, 0, 0, "comp_obs_pos", 100, 1, 100, "inactive", "periodic", 20, 50, comp_obs_pos_imp_initialize, comp_obs_pos_imp_step, comp_obs_pos_imp_finalize};
+Thread comp_obs_pos = {1, 0, 0, "comp_obs_pos", 97, 1, 97, "inactive", "periodic", 20, 20, comp_obs_pos_imp_initialize, comp_obs_pos_imp_step, comp_obs_pos_imp_finalize};
 Thread emerg = {2, 0, 0, "emerg", 5, 2, 5, "inactive", "periodic", 1, 1, emerg_imp_initialize, emerg_imp_step, emerg_imp_finalize};
-Thread PI_ctr = {3, 0, 0, "PI_ctr", 5, 1, 5, "inactive", "periodic", 1, 1, PI_ctr_imp_initialize, PI_ctr_imp_step, PI_ctr_imp_finalize};
+// Thread PI_ctr = {3, 0, 0, "PI_ctr", 5, 1, 5, "inactive", "periodic", 1, 1, PI_ctr_imp_initialize, PI_ctr_imp_step, PI_ctr_imp_finalize};
+Thread PI_ctr = {3, 0, 0, "PI_ctr", 7, 1, 7, "inactive", "periodic", 1, 1, PI_ctr_imp_initialize, PI_ctr_imp_step, PI_ctr_imp_finalize};
 Thread velo_voter = {4, 0, 0, "velo_voter", 8, 1, 8, "inactive", "periodic", 1, 1, velo_voter_imp_initialize, velo_voter_imp_step, velo_voter_imp_finalize};
-Thread pan_ctr_th = {5, 0, 0, "pan_ctr_th", -1, 0, 100, "inactive", "aperiodic", 20, 20, trig_pan_ctr_th, pan_ctr_th_imp_step, pan_ctr_th_imp_finalize};
+// Thread pan_ctr_th = {5, 0, 0, "pan_ctr_th", -1, 0, 100, "inactive", "aperiodic", 20, 20, trig_pan_ctr_th, pan_ctr_th_imp_step, pan_ctr_th_imp_finalize};
+Thread pan_ctr_th = {5, 0, 0, "pan_ctr_th", -1, 0, 50, "inactive", "aperiodic", 10, 10, trig_pan_ctr_th, pan_ctr_th_imp_step, pan_ctr_th_imp_finalize};
 
 void schedule_HPF(Thread **threads, int threadNum, Device **devices, int deviceNum, float stopTime) {
   // Print data to files
@@ -189,7 +207,7 @@ void schedule_HPF(Thread **threads, int threadNum, Device **devices, int deviceN
 //  fp_veh_a = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/veh_a.txt", "w");
 //  fp_veh_s = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/veh_s.txt", "w");
 //  fp_veh_pos = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/veh_pos.txt", "w");
-//  fp_veh_v = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/veh_v.txt", "w");
+  fp_veh_v = fopen("veh_v.txt", "w");
 //  fp_des_a = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/des_a.txt", "w");
 //  fp_des_v = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/des_v.txt", "w");
 //  fp_veh_l_v = fopen("/Users/BEAR/Projects/mars/Examples/AADL/CCS/C/C/data/veh_l_v.txt", "w");
@@ -218,7 +236,7 @@ void schedule_HPF(Thread **threads, int threadNum, Device **devices, int deviceN
 //    fprintf(fp_veh_a, "%f,", veh_a);
 //    fprintf(fp_veh_s, "%f,", veh_s);
 //    fprintf(fp_veh_pos, "%f,", veh_pos);
-//    fprintf(fp_veh_v, "%f,", veh_v);
+    fprintf(fp_veh_v, "%f,%f\n", globalClock, veh_v);
 //    fprintf(fp_des_a, "%f,", des_a);
 //    fprintf(fp_des_v, "%f,", des_v);
 //    fprintf(fp_veh_l_v, "%f,", veh_l_v);
@@ -315,6 +333,7 @@ void schedule_HPF(Thread **threads, int threadNum, Device **devices, int deviceN
     
     globalClock += StepSize;
   }
+  fclose(fp_veh_v);
 //  fclose(fp_img); fclose(fp_proc_img); fclose(fp_obs_pos_radar); fclose(fp_obs_pos); fclose(fp_cmd); fclose(fp_veh_a); fclose(fp_veh_s); fclose(fp_veh_pos); fclose(fp_veh_v); fclose(fp_des_a); fclose(fp_des_v); fclose(fp_veh_l_v); fclose(fp_laser_valid); fclose(fp_laser_v); fclose(fp_veh_w_v); fclose(fp_wheel_valid); fclose(fp_wheel_v);
 }
 
@@ -326,7 +345,7 @@ int main()
   int deviceNum = 7;
   Device *devices[7] = {&camera, &radar, &actuator, &gps, &laser, &wheel, &user_panel};
 
-  int stopTime = 20000; // (ms)
+  int stopTime = 40000; // (ms)
   
   schedule_HPF(threads, threadNum, devices, deviceNum, stopTime);
   

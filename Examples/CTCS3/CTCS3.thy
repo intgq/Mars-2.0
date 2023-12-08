@@ -624,6 +624,7 @@ fun loop_invariant :: "real \<times> real \<Rightarrow> bool" where
   "loop_invariant (s, v) \<longleftrightarrow> v \<le> fs s \<and> v \<ge> 0 \<and> s \<le> Stop_point"
 
 
+
 lemma loop_once_invariant:
   assumes "v \<le> fs s \<and> v \<ge> 0 \<and> s \<le> Stop_point"
     and "(s', v') = loop_once (s, v)"
@@ -711,7 +712,7 @@ proof -
         using 2
         unfolding fs_def Let_def apply auto
         subgoal using assms(1) fs_at_most_limit A_minus Period 
-          by (smt mult_diff_mult real_mult_less_iff1)
+          by (smt mult_diff_mult mult_less_iff1)
         subgoal premises pre
         proof-
           have "v^2 \<le> 2 * A_minus * (Stop_point - s)"

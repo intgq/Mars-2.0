@@ -32,11 +32,11 @@ theory %s
     imports HHLProver.HHLProver
 begin
 
-text \<open>Variables\<close>
+text \\<open>Variables\\<close>
 
 %s
 
-text \<open>Processes\<close>
+text \\<open>Processes\\<close>
 
 %s
 
@@ -87,9 +87,9 @@ def translate_isabelle(process, name):
                 raise NotImplementedError
         elif isinstance(e, expr.LogicExpr):
             if e.op == '||':
-                return "%s \<or> %s" % (trans_expr(e.expr1), trans_expr(e.expr2))
+                return "%s \\<or> %s" % (trans_expr(e.expr1), trans_expr(e.expr2))
             elif e.op == '&&':
-                return "%s \<and> %s" % (trans_expr(e.expr1), trans_expr(e.expr2))
+                return "%s \\<and> %s" % (trans_expr(e.expr1), trans_expr(e.expr2))
             else:
                 raise NotImplementedError
         else:
@@ -98,9 +98,9 @@ def translate_isabelle(process, name):
 
     def trans_lambda_expr(e):
         if not e.get_vars():
-            return "(\<lambda>_. %s)" % trans_expr(e)
+            return "(\\<lambda>_. %s)" % trans_expr(e)
         else:
-            return "(\<lambda>s. %s)" % trans_expr(e)
+            return "(\\<lambda>s. %s)" % trans_expr(e)
 
     def trans_ode_pair(v, eq):
         return "%s := %s" % (mapping[v], trans_lambda_expr(eq))
@@ -143,10 +143,10 @@ def translate_isabelle(process, name):
         elif proc.type == 'wait':
             return "Wait (%s)" % trans_lambda_expr(proc.delay)
         elif proc.type == 'ode':
-            return "Cont (ODE ((\<lambda>_ _. 0)(%s))) (%s)" % (
+            return "Cont (ODE ((\\<lambda>_ _. 0)(%s))) (%s)" % (
                 ', '.join(trans_ode_pair(v, eq) for v, eq in proc.eqs), trans_lambda_expr(proc.constraint))
         elif proc.type == 'ode_comm':
-            return "Interrupt (ODE ((\<lambda>_ _. 0)(%s))) (%s)\n[%s]" % (
+            return "Interrupt (ODE ((\\<lambda>_ _. 0)(%s))) (%s)\n[%s]" % (
                 ', '.join(trans_ode_pair(v, eq) for v, eq in proc.eqs),
                 trans_lambda_expr(proc.constraint),
                 ', '.join(trans_io_comm(io, proc) for io, proc in proc.io_comms))

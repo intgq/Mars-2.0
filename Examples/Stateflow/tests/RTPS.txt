@@ -1696,14 +1696,14 @@ begin
   hb_count := 0;
   sendFlag := 0;
   ackFlag := 0;
-  repair_num := [0,0];
+  repair_num := [0, 0];
   id := 0;
-  request_num := [0,0];
-  buffer_heartbeat := [[0,0,0,0]];
-  unsent := [1,1,1,1,1];
-  buffer_acknack := [[0,0,0,0],[0,0,0,0]];
+  request_num := [0, 0];
+  buffer_heartbeat := [[0, 0, 0, 0]];
+  unsent := [1, 1, 1, 1, 1];
+  buffer_acknack := [[0, 0, 0, 0], [0, 0, 0, 0]];
   ack_id := 0;
-  received_set := [[0,0,0,0,0],[0,0,0,0,0]];
+  received_set := [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
   seq_num_1 := 0;
   seq_num_2 := 0;
   SET := 0;
@@ -1713,7 +1713,7 @@ begin
   heartbeatPeriod := 1.5;
   data := 0;
   data1 := 0;
-  acked_num := [0,0];
+  acked_num := [0, 0];
   WriterId := 1;
   finalFlag := 2;
   livelinessFlag := 1;
@@ -1956,7 +1956,7 @@ begin
   DDS_WriterEL := [];
   WHC_in?WHC;
   flag := 0;
-  cachechanges := [100,200,300,400,500];
+  cachechanges := [100, 200, 300, 400, 500];
   i := 1;
   first_SN := 1;
   last_SN := 0;
@@ -1998,9 +1998,9 @@ endmodule
 
 module data_ctrl():
 begin
-  WHC := [0,0,0,0,0];
-  RHC := [0,0,0,0,0];
-  RHC2 := [0,0,0,0,0];
+  WHC := [0, 0, 0, 0, 0];
+  RHC := [0, 0, 0, 0, 0];
+  RHC2 := [0, 0, 0, 0, 0];
   {
     ch_x2_0_in!ch_x2_0 -->
       skip; $

@@ -1,5 +1,6 @@
 """Transfer function"""
 
+from fractions import Fraction
 from ss2hcsp.sl.sl_block import SL_Block
 from ss2hcsp.hcsp import expr
 from ss2hcsp.matlab import function
@@ -15,12 +16,12 @@ class TransferFcn(SL_Block):
         coeff = self.get_coeff()
         return "%s: %s_dot = -%s * %s + %s * %s" % (self.name, out_var, coeff, out_var, coeff, in_var)
 
-    def get_coeff(self) -> float:
+    def get_coeff(self) -> Fraction:
         assert isinstance(self.denom, function.ListExpr)
         assert len(self.denom.args) == 2
         assert self.denom.args[1] == function.AConst(1)
         assert isinstance(self.denom.args[0], function.AConst)
-        return 1.0 / self.denom.args[0].value
+        return Fraction(1) / Fraction(self.denom.args[0].value)
 
     def __repr__(self):
         return "TransferFcn(%s, %s)" % (self.name, self.denom)

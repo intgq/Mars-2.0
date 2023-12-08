@@ -1,5 +1,10 @@
 """Classes for Matlab functions"""
 
+from decimal import Decimal
+from fractions import Fraction
+from typing import Optional
+
+
 class Expr:
     """Base class for Matlab (non-boolean) expressions."""
     def __init__(self):
@@ -82,7 +87,7 @@ class AConst(Expr):
     """Matlab constants."""
     def __init__(self, value):
         super(AConst, self).__init__()
-        assert isinstance(value, (int, float, str))
+        assert isinstance(value, (int, Decimal, Fraction, str))
         self.value = value
 
     def __repr__(self):
@@ -751,15 +756,20 @@ class TransitionLabel:
     """Label on transitions.
 
     There are four parts to specify a transition:
-    event : [None, Event] - event trigger for the transition.
-    cond : [None, BExpr] - condition trigger for the transition.
-    cond_act : [None, Command] - action performed when checking conditions.
-    tran_act : [None, Command] - action performed at the end of transition.
+
+    event : Optional[Event]
+        event trigger for the transition.
+    cond : Optional[Expr]
+        condition trigger for the transition.
+    cond_act : Optional[Command]
+        action performed when checking conditions.
+    tran_act : Optional[Command]
+        action performed at the end of transition.
 
     """
     def __init__(self, event, cond, cond_act, tran_act):
         assert event is None or isinstance(event, Event)
-        assert cond is None or isinstance(cond, (BExpr,FunExpr))
+        assert cond is None or isinstance(cond, (BExpr, FunExpr))
         if cond_act is None:
             cond_act = Skip()
         if tran_act is None:
@@ -767,10 +777,10 @@ class TransitionLabel:
         assert isinstance(cond_act, Command)
         assert isinstance(tran_act, Command)
 
-        self.event = event
-        self.cond = cond
-        self.cond_act = cond_act
-        self.tran_act = tran_act
+        self.event: Optional[Event] = event
+        self.cond: Optional[Expr] = cond
+        self.cond_act: Command = cond_act
+        self.tran_act: Command = tran_act
 
     def __str__(self):
         event_str = str(self.event) if self.event else ""

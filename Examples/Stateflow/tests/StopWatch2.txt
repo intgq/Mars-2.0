@@ -170,7 +170,7 @@ begin
   Chart_StopW_st := "Chart_StopW_Reset";
   s := "Reset";
   log("Reset" + "\n");
-  pre_x0 := [0,0,0];
+  pre_x0 := [0, 0, 0];
   disp_cent := 0;
   Pulse_Generator_tick := 0;
   Pulse_Generator1_tick := 0;
@@ -179,24 +179,24 @@ begin
   {
     if (_tick % 6 == 0) {
       if (Pulse_Generator_tick % 10 >= 1 && Pulse_Generator_tick % 10 < 4) {
-        start := 1.0;
+        start := 1;
       } else {
-        start := 0.0;
+        start := 0;
       }
       Pulse_Generator_tick := Pulse_Generator_tick + 1;
     }
     if (_tick % 2 == 0) {
       if (Pulse_Generator1_tick % 10 >= 5 && Pulse_Generator1_tick % 10 < 8) {
-        lap := 1.0;
+        lap := 1;
       } else {
-        lap := 0.0;
+        lap := 0;
       }
       Pulse_Generator1_tick := Pulse_Generator1_tick + 1;
     }
     if (Pulse_Generator2_tick % 2 >= 0 && Pulse_Generator2_tick % 2 < 1) {
-      tick := 1.0;
+      tick := 1;
     } else {
-      tick := 0.0;
+      tick := 0;
     }
     Pulse_Generator2_tick := Pulse_Generator2_tick + 1;
     x0 := push(push(start,lap),tick);

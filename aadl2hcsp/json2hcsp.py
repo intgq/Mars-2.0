@@ -1,6 +1,7 @@
 # New version of translator from JSON to HCSP
 
 import os
+from decimal import Decimal
 
 from ss2hcsp.hcsp import expr
 from ss2hcsp.hcsp import hcsp
@@ -15,7 +16,7 @@ from ss2hcsp.sf import sf_convert
 
 def time_str_to_num(time_str):
     if time_str[-2:] == 'ms':
-        return int(time_str[:-2]) / 1000.0
+        return Decimal(str(int(time_str[:-2]) / 1000.0))
     else:
         raise NotImplementedError
 
@@ -120,6 +121,10 @@ def translate_thread(name, info, bus=None):
     max_c = time_str_to_num(info['compute_execution_time'])
     DL = time_str_to_num(info['deadline'])
     priority = info['priority']
+    if isinstance(max_c,float):
+        max_c = Decimal(str(max_c))
+    if isinstance(DL,float):
+        DL = Decimal(str(DL))
     args = [expr.AConst(0),
             expr.AConst(name),
             expr.AConst(max_c),
@@ -206,6 +211,8 @@ def translate_thread(name, info, bus=None):
 
     initializations = list()
     for port_name, port_val in info['input'].items():
+        if isinstance(port_val['val'],float):
+            port_val['val'] = Decimal(str(port_val['val']))
         initializations.append(hcsp.Assign(
             var_name=port_val['var'], expr=hcsp.AConst(port_val['val'])))
     if 'initialization' in info.keys():
@@ -359,6 +366,8 @@ def translate_system(json_info):
                 args.append(expr.AConst(target))
                 args.append(expr.AConst(target_port))
             if info['type'] == "data":
+                if isinstance (info['init_value'],float):
+                    info['init_value'] = Decimal(str(info['init_value']))
                 args.append(expr.AConst(info['init_value']))
                 component_mod_insts.append(module.HCSPModuleInst(
                     name, "DataBuffer"+str(len(targets)), args))

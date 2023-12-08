@@ -22,7 +22,7 @@ begin
   i := 0;
   x := 2;
   y := 3;
-  a := [0,0,1,2];
+  a := [0, 0, 1, 2];
   Chart_st := "Chart_A";
   s := "en_A";
   log("en_A" + "\n");

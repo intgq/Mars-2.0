@@ -30,8 +30,17 @@ class SF_Chart(Triggered_Subsystem):
         self.port_to_out_var = dict()
 
     def __str__(self):
-        input_events_str = ""
+        res = "SF_Chart(%s):\n" % self.name
+
+        # Print input events
         if self.input_events:
             for trigger_type, event in self.input_events:
-                input_events_str += "Input event %s, %s\n" % (trigger_type, event)
-        return "Chart(%s):\n%s%s" % (self.name, input_events_str, str(self.diagram))
+                res += "Input event %s, %s\n" % (trigger_type, event)
+
+        # Print output ports
+        for id, v in self.port_to_out_var.items():
+            res += "Output port: %s -> %s\n" % (id, v)
+
+        # Print diagram
+        res += str(self.diagram)
+        return res

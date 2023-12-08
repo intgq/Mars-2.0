@@ -3,113 +3,119 @@
 import unittest
 
 from ss2hcsp.hcsp.expr import AConst
-from ss2hcsp.hcsp.parser import hp_parser, module_parser, system_parser, decls_parser
+from ss2hcsp.hcsp.parser import parse_module, parse_system, parse_decls
 from ss2hcsp.hcsp.module import HCSPModule, HCSPModuleInst, HCSPSystem, HCSPDeclarations, read_file
-from ss2hcsp.hcsp.hcsp import Channel
+from ss2hcsp.hcsp.hcsp import Channel, HCSPOutput
 
 
 class ModuleTest(unittest.TestCase):
     def testParseModule(self):
-        mod = module_parser.parse("""
-            module P0():
-                output x;
-                begin
-                    x := 0;
-                    { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
-                end
-            endmodule
+        mod = parse_module(
+        """
+        module P0():
+            output x;
+            begin
+                x := 0;
+                { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
+            end
+        endmodule
         """)
 
         self.assertEqual(str(mod), "P0()")
-        self.assertEqual(mod.outputs, (('x',),))
+        self.assertEqual(list(mod.outputs), [HCSPOutput("x")])
 
     def testParseModule2(self):
-        mod = module_parser.parse("""
-            module P1():
-                begin
-                    { wait(2); p2c?x; c2p!x-1; }*
-                end
-            endmodule
+        mod = parse_module(
+        """
+        module P1():
+            begin
+                { wait(2); p2c?x; c2p!x-1; }*
+            end
+        endmodule
         """)
 
         self.assertEqual(str(mod), "P1()")
         self.assertEqual(mod.outputs, ())
 
     def testParseSystem(self):
-        sys = system_parser.parse("""
-            system
-                P0() ||
-                P1()
-            endsystem
+        sys = parse_system(
+        """
+        system
+            P0() ||
+            P1()
+        endsystem
         """)
         self.assertEqual(str(sys), "P0() ||\nP1()")
         self.assertEqual(repr(sys), "System(P0(); P1())")
 
     def testParseDecls(self):
-        decls = decls_parser.parse("""
-            %type: module
+        decls = parse_decls(
+        """
+        %type: module
 
-            module P0():
-                output x;
-                begin
-                    x := 0;
-                    {{x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x;}*
-                end
-            endmodule
+        module P0():
+            output x;
+            begin
+                x := 0;
+                {{x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x;}*
+            end
+        endmodule
 
-            module P1():
-                begin
-                    { wait(2); p2c?x; c2p!x-1; }*
-                end
-            endmodule
+        module P1():
+            begin
+                { wait(2); p2c?x; c2p!x-1; }*
+            end
+        endmodule
 
-            system
-                P0() ||
-                P1()
-            endsystem
+        system
+            P0() ||
+            P1()
+        endsystem
         """)
 
         self.assertEqual(str(decls), "P0()\nP1()\nP0() ||\nP1()")
         self.assertEqual(repr(decls), "Decls(\n  Module(P0)\n  Module(P1)\n  System(P0(); P1())\n)")
 
     def testParseModule3(self):
-        mod = module_parser.parse("""
-            module P0(p2c,c2p):
-            output x;
-            begin
-                x := 0;
-                { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
-            end
-            endmodule
+        mod = parse_module(
+        """
+        module P0(p2c,c2p):
+        output x;
+        begin
+            x := 0;
+            { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
+        end
+        endmodule
         """)
 
         self.assertEqual(str(mod), "P0(p2c,c2p)")
         self.assertEqual(repr(mod), "Module(P0,p2c,c2p)")
 
     def testParseDecls2(self):
-        decls = decls_parser.parse("""
-            %type: module
+        decls = parse_decls(
+        """
+        %type: module
 
-            module P0(p2c,c2p):
-            output x;
-            begin
-                x := 0;
-                { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
-            end
-            endmodule
+        module P0(p2c,c2p):
+        output x;
+        begin
+            x := 0;
+            { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*
+        end
+        endmodule
 
-            module P1(p2c,c2p):
-            begin
-                { wait(2); p2c?x; c2p!x-1; }*
-            end
-            endmodule
+        module P1(p2c,c2p):
+        begin
+            { wait(2); p2c?x; c2p!x-1; }*
+        end
+        endmodule
 
-            system
-                P0a = P0(ch1,ch2) ||
-                P1a = P1(ch1,ch2) ||
-                P0b = P0(ch3,ch4) ||
-                P1b = P1(ch3,ch4)
-            endsystem
+        system
+            P0a = P0(ch1,ch2) ||
+            P1a = P1(ch1,ch2) ||
+            P0b = P0(ch3,ch4) ||
+            P1b = P1(ch3,ch4)
+        endsystem
         """)
 
         self.assertEqual(str(decls),
@@ -120,7 +126,7 @@ class ModuleTest(unittest.TestCase):
     def testGenerateHCSPInfo(self):
         decls = HCSPDeclarations([
             HCSPModule("P0", "x := 0; { {x_dot = 1 & true} |> [](p2c!x --> skip;) c2p?x; }*",
-                       params=("p2c", "c2p"), outputs=(("x",),)),
+                       params=("p2c", "c2p"), outputs=[HCSPOutput("x")]),
             HCSPModule("P1", "{ wait(2); p2c?x; c2p!x-1; }*",
                        params=("p2c", "c2p")),
             HCSPSystem([
@@ -138,11 +144,12 @@ class ModuleTest(unittest.TestCase):
         self.assertEqual(str(infos[3].hp), "{wait(2); ch3?x; ch4!x - 1;}*")
 
     def testParseSystem2(self):
-        sys = system_parser.parse("""
-            system
-                P0(ch1, ch2, $0) ||
-                P1(ch1, ch2)
-            endsystem
+        sys = parse_system(
+        """
+        system
+            P0(ch1, ch2, $0) ||
+            P1(ch1, ch2)
+        endsystem
         """)
 
         self.assertEqual(str(sys), "P0(ch1, ch2, $0) ||\nP1(ch1, ch2)")
@@ -151,7 +158,7 @@ class ModuleTest(unittest.TestCase):
     def testGenerateHCSPInfo2(self):
         decls = HCSPDeclarations([
             HCSPModule("P0", "x := init_x; {{x_dot = slope & true} |> [](p2c!x --> skip;) c2p?x;}*",
-                       params=("p2c", "c2p", "init_x", "slope"), outputs=(("x",),),),
+                       params=("p2c", "c2p", "init_x", "slope"), outputs=[HCSPOutput("x")],),
             HCSPModule("P1", "{wait(dly); p2c?x; c2p!x-1;}*",
                        params=("p2c", "c2p", "dly")),
             HCSPSystem([
@@ -169,38 +176,39 @@ class ModuleTest(unittest.TestCase):
         self.assertEqual(str(infos[3].hp), "{wait(3); ch3?x; ch4!x - 1;}*")
 
     def testReadFile(self):
-        decls = decls_parser.parse(read_file('channels.txt'))
+        decls = parse_decls(read_file('channels.txt'))
         self.assertEqual(str(decls), "asyncChannel(ch_out,ch_in)\nNone")
 
     def testParseDecls3(self):
-        decls = decls_parser.parse("""
-            %type: module
+        decls = parse_decls(
+        """
+        %type: module
 
-            import channels
+        import channels
 
-            module input(ch_in):
-            begin
-            {
-                ch_in?x;
-            }*
-            end
-            endmodule
+        module input(ch_in):
+        begin
+        {
+            ch_in?x;
+        }*
+        end
+        endmodule
 
-            module output(ch_out):
-            begin
-            x := 0;
-            {
-                x := x + 1;
-                ch_out!x;
-            }*
-            end
-            endmodule
+        module output(ch_out):
+        begin
+        x := 0;
+        {
+            x := x + 1;
+            ch_out!x;
+        }*
+        end
+        endmodule
 
-            system
-                input(ch_in) ||
-                output(ch_out) ||
-                asyncChannel(ch_out, ch_in)
-            endsystem
+        system
+            input(ch_in) ||
+            output(ch_out) ||
+            asyncChannel(ch_out, ch_in)
+        endsystem
         """)
 
         infos = decls.generateHCSPInfo()

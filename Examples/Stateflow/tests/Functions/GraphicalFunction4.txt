@@ -37,7 +37,7 @@ end
 
 begin
   ChartEL := [];
-  a := [0,0,0,1,0];
+  a := [0, 0, 0, 1, 0];
   Chart_st := "Chart_A";
   s := "en_A";
   log("en_A" + "\n");

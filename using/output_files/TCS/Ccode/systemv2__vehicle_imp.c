@@ -12,13 +12,13 @@ static Channel channel;
 static Channel channels[4];
 static double h = step_size;
 static double* midDouble = NULL;
-	static double PHY_vehicle_imp_veh_a = 0.0;
-	static double PHY_vehicle_imp_veh_s = 0.0;
 	static double s = 0.0;
-	static double PHY_vehicle_imp_veh_v_l = 0.0;
+	static double PHY_vehicle_imp_veh_a = 0.0;
 	static double a = 0.0;
-	static double PHY_vehicle_imp_veh_v_w = 0.0;
 	static double v = 0.0;
+	static double PHY_vehicle_imp_veh_s = 0.0;
+	static double PHY_vehicle_imp_veh_v_w = 0.0;
+	static double PHY_vehicle_imp_veh_v_l = 0.0;
 
 void* vehicle_imp (void* arg) {
     threadNumber = (int)(*((int*)arg));

@@ -1,8 +1,10 @@
 """Unit delay block"""
 
+from decimal import Decimal
+from fractions import Fraction
+
 from ss2hcsp.sl.sl_block import SL_Block
-from ss2hcsp.hcsp.expr import AVar, AConst, RelExpr, OpExpr
-from ss2hcsp.hcsp.parser import hp_parser
+from ss2hcsp.hcsp.expr import AVar
 from ss2hcsp.hcsp import hcsp as hp
 
 
@@ -13,7 +15,7 @@ class UnitDelay(SL_Block):
 
         assert st > 0, "st must be positive for unit delay blocks"
 
-        assert isinstance(init_value, (int, float))
+        assert isinstance(init_value, (int, Decimal, Fraction))
         self.init_value = init_value
 
     def __str__(self):

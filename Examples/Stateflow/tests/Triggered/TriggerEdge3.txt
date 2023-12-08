@@ -13,9 +13,9 @@ begin
   tt := 0;
   {
     if (Pulse_Generator_tick % 10 >= 2 && Pulse_Generator_tick % 10 < 7) {
-      signal := 1.0;
+      signal := 1;
     } else {
-      signal := 0.0;
+      signal := 0;
     }
     Pulse_Generator_tick := Pulse_Generator_tick + 1;
     if (pre_signal <= 0 && signal > 0 || pre_signal > 0 && signal <= 0) {

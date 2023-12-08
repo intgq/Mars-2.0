@@ -1,3 +1,5 @@
+from decimal import Decimal
+from fractions import Fraction
 from ss2hcsp.sl.sl_block import SL_Block
 from ss2hcsp.hcsp.expr import AConst
 
@@ -7,7 +9,7 @@ class Constant(SL_Block):
     def __init__(self, name, value):
         super(Constant, self).__init__("constant", name, 1, 0, st=0)
 
-        assert isinstance(value, (int, float))
+        assert isinstance(value, (int, Decimal, Fraction))
         self.value = value
 
     def __str__(self):

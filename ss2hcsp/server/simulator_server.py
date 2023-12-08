@@ -16,6 +16,9 @@ from pstats import Stats
 import cProfile
 import random
 
+import sys
+sys.path.append("..")
+
 app = Flask(__name__)
 
 

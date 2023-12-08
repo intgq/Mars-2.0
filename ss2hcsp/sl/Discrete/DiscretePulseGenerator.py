@@ -54,7 +54,7 @@ class DiscretePulseGenerator(SL_Block):
         cond = conj(hp.RelExpr(">=", cycle_st, AConst(self.start_st)),
                     hp.RelExpr("<", cycle_st, AConst(self.end_st)))
         act1 = hp.Assign(out_var, AConst(self.amplitude))
-        act2 = hp.Assign(out_var, AConst(0.0))
+        act2 = hp.Assign(out_var, AConst(0))
         procs.append(hp.ITE([(cond, act1)], act2))
         procs.append(hp.Assign(self.tick_var, OpExpr("+", AVar(self.tick_var), AConst(1))))
         return hp.seq(procs)

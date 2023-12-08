@@ -12,7 +12,7 @@ from ss2hcsp.hcsp.parser import parse_module_file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-sf', '--sourcefile', type=str, default = "using/output_files/TCS/hcsp/systemv2.txt", help = "name of the source combined HCSP file")
-    parser.add_argument('-dd', '--destdirectory', type=str, default = "using/output_files/TCS/Ccode/", help = "name of the destination directory of the output C code files")
+    parser.add_argument('-dd', '--destdirectory', type=str, default = "using/output_files/TCS/Ccode", help = "name of the destination directory of the output C code files")
     parser.add_argument('-df', '--destfile', type=str, default = "systemv2", help = "name of the destination file")
     parser.add_argument('-step', '--stepsize', type=float, default = 1e-4, help = "size of the step in discretization")
     parser.add_argument('-mt', '--maxtime', type=float, default = 40.0, help = "the max time of the execution")

@@ -12,18 +12,18 @@ static Channel channel;
 static Channel channels[9];
 static double h = step_size;
 static double* midDouble = NULL;
-	static String state;
-	static double entered = 0.0;
-	static double c = 0.0;
-	static double obs_pos = 0.0;
 	static double x1 = 0.0;
-	static double t = 0.0;
-	static double x3 = 0.0;
-	static double obs_pos_radar = 0.0;
-	static double x0 = 0.0;
+	static double obs_pos = 0.0;
+	static double entered = 0.0;
 	static double proc_img = 0.0;
-	static double x2 = 0.0;
+	static double x3 = 0.0;
 	static double prior = 0.0;
+	static String state;
+	static double x2 = 0.0;
+	static double x0 = 0.0;
+	static double c = 0.0;
+	static double t = 0.0;
+	static double obs_pos_radar = 0.0;
 
 void* comp_obs_pos (void* arg) {
     threadNumber = (int)(*((int*)arg));

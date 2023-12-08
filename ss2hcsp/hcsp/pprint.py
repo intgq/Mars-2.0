@@ -5,7 +5,7 @@ from ss2hcsp.hcsp import hcsp
 from ss2hcsp.hcsp import expr
 
 
-def pprint_lines(hp, *, max_line=None, record_pos=False):
+def pprint_lines(hp: hcsp.HCSP, *, max_line=None, record_pos=False):
     """Pretty-printing for a HCSP command.
     
     If max_line=None, always change line on sequence, select_comm,

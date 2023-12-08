@@ -12,8 +12,8 @@ static Channel channel;
 static Channel channels[2];
 static double h = step_size;
 static double* midDouble = NULL;
-	static List queue;
 	static String event;
+	static List queue;
 
 void* tran_event (void* arg) {
     threadNumber = (int)(*((int*)arg));

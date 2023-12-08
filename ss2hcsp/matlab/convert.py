@@ -99,14 +99,10 @@ def convert_expr(e: function.Expr, *, procedures=None, arrays=None, states=None)
             elif e.fun_name in arrays:
                 # Subtract one since indexing in Matlab is 1-based while indexing
                 # in HCSP is 0-based.
-                if len(e.exprs) == 1:
-                    return expr.ArrayIdxExpr(e.fun_name, [subtract_one(rec(arg)) for arg in e.exprs])
-                elif len(e.exprs) == 2:
-                    return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(e.fun_name),subtract_one(rec(e.exprs[0]))),subtract_one(rec(e.exprs[1])))
-                elif len(e.exprs) == 3:
-                    return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(e.fun_name),subtract_one(rec(e.exprs[0]))),subtract_one(rec(e.exprs[1]))),subtract_one(rec(e.exprs[2])))
-                else:
-                    raise NotImplementedError
+                res = expr.AVar(e.fun_name)
+                for idx in e.exprs:
+                    res = expr.ArrayIdxExpr(res, subtract_one(rec(idx)))
+                return res
             elif procedures is not None and e.fun_name in procedures:
                 proc = procedures[e.fun_name]
                 if isinstance(proc, GraphicalFunction):
@@ -186,27 +182,19 @@ def convert_cmd(cmd, *, raise_event=None, procedures=None, still_there=None, arr
             res.append(hp_e)
         return hcsp.seq(pre_acts), res
 
-    def convert_lname(lname,val):
+    def convert_lname(lname, val):
         if isinstance(lname, function.Var):
             return expr.AVar(lname.name)
         elif isinstance(lname, function.FunExpr):
             # Subtract one since indexing in Matlab is 1-based while indexing
             # in HCSP is 0-based.
-            pre_act, args = conv_exprs(lname.exprs)
+            pre_act, _ = conv_exprs(lname.exprs)
             assert pre_act == hcsp.Skip(), "convert_lname"
-            if len(lname.exprs) == 1:
-                pre_act, hp_e = conv_expr(lname.exprs[0])
-                return expr.ArrayIdxExpr(
-                    expr.AVar(lname.fun_name), [subtract_one(hp_e)])
-            elif len(lname.exprs) == 2:
-                _, hp_e1 = conv_expr(lname.exprs[0])
-                _, hp_e2 = conv_expr(lname.exprs[1])
-                return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(lname.fun_name),subtract_one(hp_e1)),subtract_one(hp_e2))
-            elif len(lname.exprs) == 3:
-                _, hp_e1 = conv_expr(lname.exprs[0])
-                _, hp_e2 = conv_expr(lname.exprs[1])
-                _, hp_e3 = conv_expr(lname.exprs[2])
-                return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(lname.fun_name),subtract_one(hp_e1)),subtract_one(hp_e2)),subtract_one(hp_e3))
+            res = expr.AVar(lname.fun_name)
+            for e in lname.exprs:
+                _, hp_e = conv_expr(e)
+                res = expr.ArrayIdxExpr(res, subtract_one(hp_e))
+            return res
         elif isinstance(lname, function.ListExpr):
             return [convert_lname(arg,val) for arg in lname.args]
         elif isinstance(lname, function.DirectName):
@@ -216,7 +204,6 @@ def convert_cmd(cmd, *, raise_event=None, procedures=None, still_there=None, arr
                 message.data = int(str(val))
                 messages[str(sname)] = message
             return expr.FieldNameExpr(expr.AVar(sname), str(lname.exprs[1]))
-
         else:
             raise NotImplementedError
 

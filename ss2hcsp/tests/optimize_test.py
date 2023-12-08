@@ -3,7 +3,7 @@
 import unittest
 
 from ss2hcsp.hcsp.optimize import full_optimize
-from ss2hcsp.hcsp.parser import hp_parser
+from ss2hcsp.hcsp.parser import parse_hp
 
 
 class OptimizeTest(unittest.TestCase):
@@ -44,8 +44,8 @@ class OptimizeTest(unittest.TestCase):
         ]
 
         for s, res in test_data:
-            hp = hp_parser.parse(s)
-            res_hp = hp_parser.parse(res)
+            hp = parse_hp(s)
+            res_hp = parse_hp(res)
             opt_hp = full_optimize(hp)
             self.assertEqual(res_hp, opt_hp, "%s != %s" % (str(res_hp), str(opt_hp)))
 

@@ -293,7 +293,7 @@ class SimInfo:
     def __str__(self):
         return str({'name': self.name, 'hp': self.hp, 'pos': self.callstack.top_pos(), 'state': self.state, 'reason': self.reason})
 
-    def eval_expr(self, expr):
+    def eval_expr(self, expr: Expr):
         """Evaluate the given expression on the current state."""
         if expr is None:
             return None
@@ -354,6 +354,8 @@ class SimInfo:
                 return int(a) // int(b)
             elif expr.fun_name == "sin":
                 return math.sin(args[0])
+            elif expr.fun_name == "cos":
+                return math.cos(args[0])
             elif expr.fun_name == "push":
                 a, b = args
                 if not isinstance(a, list):
@@ -1368,7 +1370,7 @@ def exec_parallel(infos: List[SimInfo], *, num_io_events=None, num_steps=3000, n
                             new_entry['state'][output.varname+'['+str(i)+']'] = val
             else:
                 try:
-                    v = eval_expr(output.expr, state)
+                    v = info.eval_expr(output.expr)
                     if isinstance(v, (int, float)):
                         new_entry['state'][output.varname] = v
                     elif isinstance(v, list):
@@ -1634,8 +1636,3 @@ def check_comms(infos: List[hcsp.HCSPInfo]):
             warnings.append("Warning: output channel %s has no corresponding input" % ch_name)
 
     return warnings
-
-
-# Some convenient functions from simulator
-def eval_expr(e, state):
-    return SimInfo("P1", hcsp.Skip(), state=state).eval_expr(e)

@@ -1,7 +1,7 @@
 """Hybrid programs"""
 
 from collections import OrderedDict
-from typing import Dict, List, Optional, Tuple, Union, Set
+from typing import Dict, Iterable, List, Optional, Tuple, Union, Set
 
 from ss2hcsp.hcsp.expr import Expr, AVar, AConst, Expr, true_expr, false_expr, RelExpr, LogicExpr, Expr
 from ss2hcsp.hcsp import assertion
@@ -871,7 +871,8 @@ class ODE(HCSP):
     {F(s',s) = 0 & B} |> Q
 
     """
-    def __init__(self, eqs, constraint, *, out_hp=Skip(), meta=None, rule="dw", ghosts=tuple(), inv=tuple()):
+    def __init__(self, eqs: List[Tuple[str, Expr]], constraint: Expr, *,
+                 out_hp: HCSP = Skip(), meta=None, rule="dw", ghosts=tuple(), inv=tuple()):
         """Each equation is of the form (var_name, expr), where var_name
         is the name of the variable, and expr is its derivative.
 
@@ -903,7 +904,7 @@ class ODE(HCSP):
         self.inv = inv
 
     def __eq__(self, other):
-        return self.type == other.type and self.eqs == other.eqs and \
+        return isinstance(other, ODE) and self.eqs == other.eqs and \
                self.constraint == other.constraint and self.out_hp == other.out_hp and \
                self.ghosts == other.ghosts and self.inv == other.inv
 
@@ -957,7 +958,8 @@ class ODE_Comm(HCSP):
     {F(s',s) = 0 & B} |> [] (io_i --> Q_i)
 
     """
-    def __init__(self, eqs, constraint, io_comms, meta=None):
+    def __init__(self, eqs: List[Tuple[str, Expr]], constraint: Expr,
+                 io_comms: List[Tuple[HCSP, HCSP]], meta=None):
         """Each equation is of the form (var_name, expr). Each element
         of io_comms is of the form (comm_hp, out_hp), where comm_hp
         is a communication process (either InputChannel or OutputChannel).
@@ -1228,27 +1230,31 @@ class SelectComm(HCSP):
 
 
 class ITE(HCSP):
-    def __init__(self, if_hps, else_hp=None, meta=None):
+    def __init__(self, if_hps: Iterable[Tuple[Expr, HCSP]],
+                 else_hp: Optional[HCSP] = None, meta=None):
         """if-then-else statements.
-
-        if_hps : List[Tuple[Expr, HCSP]] - list of condition-program pairs.
-        else_hp : [None, HCSP]
 
         The program associated to the first true condition in if_hps will
         be executed. If no condition is true, else_hp is executed.
 
+        Parameters
+        ----------
+        if_hps : List[Tuple[Expr, HCSP]]
+            List of condition-program pairs.
+        else_hp : Optional[HCSP]
+            Program to be executed if none of the if conditions hold.
         """
         super(ITE, self).__init__()
         assert all(isinstance(cond, Expr) and isinstance(hp, HCSP) for cond, hp in if_hps)
         assert len(if_hps) > 0, "ITE: must have at least one if branch"
         assert else_hp is None or isinstance(else_hp, HCSP)
         self.type = "ite"
-        self.if_hps: List[Tuple[Expr, HCSP]] = list(tuple(p) for p in if_hps)
+        self.if_hps: Tuple[Tuple[Expr, HCSP]] = tuple(tuple(p) for p in if_hps)
         self.else_hp: Optional[HCSP] = else_hp
         self.meta = meta
 
     def __eq__(self, other):
-        return self.type == other.type and self.if_hps == other.if_hps and self.else_hp == other.else_hp
+        return isinstance(other, ITE) and self.if_hps == other.if_hps and self.else_hp == other.else_hp
 
     def __repr__(self):
         if_hps_strs = ", ".join("%s, %s" % (cond, repr(hp)) for cond, hp in self.if_hps)
@@ -1416,14 +1422,23 @@ class Procedure:
 class HCSPOutput:
     """Represents an output info"""
     def __init__(self, varname: str, expr: Optional[Expr] = None):
-        self.varname: str = varname
-        self.expr: Optional[Expr] = expr
+        self.varname = varname
+        self.expr = expr
 
     def __str__(self):
         if self.expr is None:
             return self.varname
         else:
             return self.varname + " = " + str(self.expr)
+        
+    def __repr__(self):
+        if self.expr:
+            return "HCSPOutput(%s, %s)" % (self.varname, self.expr)
+        else:
+            return "HCSPOutput(%s)" % (self.varname)
+
+    def __eq__(self, other):
+        return isinstance(other, HCSPOutput) and self.varname == other.varname and self.expr == other.expr
 
     def toJson(self):
         if self.expr is None:

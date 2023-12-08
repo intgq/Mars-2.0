@@ -3,11 +3,12 @@
 from decimal import Decimal
 from functools import reduce
 from math import gcd, pow
-from typing import List
+from typing import Dict, List, Union
 
 from ss2hcsp.sl import sl_line
-from ss2hcsp.sl.sl_line import SL_Line, UnknownLine
-from ss2hcsp.hcsp import expr
+from ss2hcsp.sl.sl_line import SL_Line
+from ss2hcsp.hcsp.expr import true_expr, Expr
+from ss2hcsp.hcsp.hcsp import HCSP
 
 
 def get_gcd(sample_times):
@@ -49,7 +50,7 @@ def get_gcd(sample_times):
 
 class SL_Block:
     """Represents a block in a Simulink diagram."""
-    def __init__(self, type: str, name: str, num_src: int, num_dest: int, st):
+    def __init__(self, type: str, name: str, num_src: int, num_dest: int, st: Union[int, Decimal]):
         # Name of the block
         self.name = name
 
@@ -78,7 +79,7 @@ class SL_Block:
         self.st = st
 
         # Enabled condition
-        self.enable = expr.true_expr
+        self.enable = true_expr
 
     def add_src(self, port_id: int, line: SL_Line) -> None:
         """Add a source line."""
@@ -97,7 +98,8 @@ class SL_Block:
 
     def add_dest(self, port_id: int, line: SL_Line) -> None:
         """Add a destination line."""
-        assert port_id < self.num_dest
+        if not port_id < self.num_dest:
+            raise AssertionError("add_dest: port id %s out of bounds in block %s" % (port_id, self))
         self.dest_lines[port_id] = line
 
     def get_src_blocks(self):
@@ -110,8 +112,14 @@ class SL_Block:
         assert all(len(set(line.name for line in line_list)) == 1 for line_list in self.src_lines)
         return set(line_list[0].name for line_list in self.src_lines)
 
-    def get_init_hp(self):
-        raise NotImplementedError
+    def get_init_hp(self) -> HCSP:
+        """Return the initialization process, for discrete blocks."""
+        raise NotImplementedError("get_init_hp: %s" % self.type)
 
-    def get_output_hp(self):
-        raise NotImplementedError
+    def get_output_hp(self) -> HCSP:
+        """Return the output process, for discrete blocks."""
+        raise NotImplementedError("get_output_hp: %s" % self.type)
+
+    def get_var_subst(self) -> Dict[str, Expr]:
+        """Return variable substitutions, for a continuous block."""
+        raise NotImplementedError("get_var_subst: %s" % self.type)

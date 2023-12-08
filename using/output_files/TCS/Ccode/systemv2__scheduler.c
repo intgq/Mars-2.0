@@ -12,17 +12,17 @@ static Channel channel;
 static Channel channels[30];
 static double h = step_size;
 static double* midDouble = NULL;
-	static double del_index = 0.0;
+	static List Pool_now;
 	static List GetMaxList;
-	static double idx = 0.0;
 	static double run_prior = 0.0;
+	static double prior = 0.0;
+	static double del_index = 0.0;
 	static double now_prior = 0.0;
-	static List Pool_prior;
+	static double idx = 0.0;
 	static String run_now;
 	static double max_index = 0.0;
 	static String now_now;
-	static List Pool_now;
-	static double prior = 0.0;
+	static List Pool_prior;
 
 void* scheduler (void* arg) {
     threadNumber = (int)(*((int*)arg));

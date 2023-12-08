@@ -1,5 +1,6 @@
 """Parsing for matlab functions."""
 
+from decimal import Decimal
 from lark import Lark, Transformer, v_args
 
 from ss2hcsp.matlab import function
@@ -167,7 +168,7 @@ class MatlabTransformer(Transformer):
         return function.ListExpr(*args)
 
     def num_expr(self, v):
-        return function.AConst(float(v) if '.' in v or 'e' in v else int(v))
+        return function.AConst(Decimal(v) if '.' in v or 'e' in v else int(v))
 
     def string_expr(self, s):
         # Remove quotes
@@ -369,8 +370,6 @@ class MatlabTransformer(Transformer):
         return function.StateOperate(name, en_op, du_op, ex_op)
    
        
-
-
 expr_parser = Lark(grammar, start="expr", parser="lalr", transformer=MatlabTransformer())
 cond_parser = Lark(grammar, start="cond", parser="lalr", transformer=MatlabTransformer())
 cmd_parser = Lark(grammar, start="cmd", parser="lalr", transformer=MatlabTransformer())
@@ -379,3 +378,6 @@ func_sig_parser = Lark(grammar, start="func_sig", parser="lalr", transformer=Mat
 function_parser = Lark(grammar, start="function", parser="lalr", transformer=MatlabTransformer())
 transition_parser = Lark(grammar, start="transition", parser="lalr", transformer=MatlabTransformer())
 state_op_parser=Lark(grammar, start="state_op", parser="lalr", transformer=MatlabTransformer())
+
+def parse_transition(text: str) -> function.TransitionLabel:
+    return transition_parser.parse(text)

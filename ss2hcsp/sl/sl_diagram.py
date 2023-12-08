@@ -1,6 +1,7 @@
 """Simulink diagrams."""
 
-from typing import Dict
+from fractions import Fraction
+from typing import Dict, List
 import lark
 from decimal import Decimal
 
@@ -65,7 +66,7 @@ def parse_value(value, default=None):
     """Parse value to integer or float."""
     if value:
         if '.' in value:
-            return float(value)
+            return Decimal(value)
         elif '[' in value and ']' in value:
             assert len(value) >3
             value = value[1:-1]
@@ -107,7 +108,7 @@ class SL_Diagram:
         self.chart_parameters = dict()
 
         # Dictionary of constants
-        self.constants = dict()
+        self.constants: Dict[str, (int, Decimal, Fraction)] = dict()
 
         # XML data structure
         self.model = None
@@ -116,8 +117,8 @@ class SL_Diagram:
         self.name = None
 
         # Different parts of the diagram
-        self.continuous_blocks = list()
-        self.discrete_blocks = list()
+        self.continuous_blocks: List[SL_Block] = list()
+        self.discrete_blocks: List[SL_Block] = list()
         self.scopes = list()
         self.dsms = list()
         
@@ -466,7 +467,7 @@ class SL_Diagram:
             matstructs = workspace[0].getElementsByTagName("MATStruct")
             for struct in matstructs:
                 name = get_field_attribute_value(struct, "Name")
-                value = float(get_field_attribute_value(struct, "Value"))
+                value = parse_value(get_field_attribute_value(struct, "Value"))
                 self.constants[name] = value
 
         # Add blocks
@@ -566,7 +567,7 @@ class SL_Diagram:
                     self.add_block(Reference(name=block_name, relop=relop, st=sample_time))
                 if block_type == "Digital clock":
                     period = get_attribute_value(block, "period")
-                    self.chart_parameters['st']=float(period)/2
+                    self.chart_parameters['st'] = parse_value(period) / 2
 
                     self.add_block(Clock(name=block_name,period=period))
             elif block_type == "Abs":
@@ -620,7 +621,10 @@ class SL_Diagram:
                 self.add_block(Switch(name=block_name, relation=relation, threshold=threshold, st=sample_time))
             elif block_type == "DiscretePulseGenerator":
                 pulseType = get_attribute_value(block, "PulseType") if get_attribute_value(block, "PulseType") else "Sample based"
-                amplitude = float(get_attribute_value(block, "Amplitude")) if get_attribute_value(block, "Amplitude") else 1.0
+                if get_attribute_value(block, "Amplitude"):
+                    amplitude = parse_value(get_attribute_value(block, "Amplitude"))
+                else:
+                    amplitude = 1
                 period = Decimal(get_attribute_value(block, "Period"))
                 pulseWidth = Decimal(get_attribute_value(block, "PulseWidth"))
                 phaseDelay = Decimal(get_attribute_value(block, "PhaseDelay")) if get_attribute_value(block, "PhaseDelay") else Decimal("0.0")
@@ -683,16 +687,18 @@ class SL_Diagram:
             elif block_type == "HitCross":
                 HC_offset = get_attribute_value(block, "HitCorssingOffset")
                 if not HC_offset:
-                    HC_offset = float(block_parameters["HitCross"]["HitCrossingOffset"])
+                    HC_offset = parse_value(block_parameters["HitCross"]["HitCrossingOffset"])
                 else:
-                    HC_offset = float(HC_offset)
+                    HC_offset = parse_value(HC_offset)
                 HC_direction = get_attribute_value(block, "HitCorssingDirection")
                 if not HC_direction:
                     HC_direction = block_parameters["HitCross"]["HitCrossingDirection"]
                 HC_zerocross = get_attribute_value(block, "ZeroCross")
                 if not HC_zerocross:
                     HC_zerocross = block_parameters["HitCross"]["ZeroCross"]
-                self.add_block(Hitcross(name=block_name,HC_offset=HC_offset,HC_direction=HC_direction,HC_zerocross=HC_zerocross,st=sample_time))
+                self.add_block(Hitcross(
+                    name=block_name, HC_offset=HC_offset, HC_direction=HC_direction,
+                    HC_zerocross=HC_zerocross, st=sample_time))
             elif block_type == "SubSystem":
                 subsystem = block.getElementsByTagName("System")[0]
 
@@ -733,7 +739,7 @@ class SL_Diagram:
                                 assert yData.count('[') == yData.count(']') == 1
                                 start = yData.index('[')
                                 end = yData.index(']')
-                                data_axises.append(tuple(float(e) for e in yData[start+1:end].split(',')))
+                                data_axises.append(tuple(parse_value(e) for e in yData[start+1:end].split(',')))
 
                     if not signal_names:
                         for node in subsystem.getElementsByTagName("Object"):
@@ -754,7 +760,7 @@ class SL_Diagram:
                                 assert yData.count('[') == yData.count(']') == 1
                                 start = yData.index('[')
                                 end = yData.index(']')
-                                data_axises.append(tuple(float(e) for e in yData[start + 1:end].split(',')))
+                                data_axises.append(tuple(parse_value(e) for e in yData[start + 1:end].split(',')))
 
                     assert signal_names
                     self.add_block(SignalBuilder(name=block_name, signal_names=tuple(signal_names),

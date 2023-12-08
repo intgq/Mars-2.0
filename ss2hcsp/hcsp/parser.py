@@ -1,11 +1,13 @@
 """Parser for expressions."""
 
 from typing import List
-from lark import Lark, Transformer, v_args, exceptions
+from lark import Lark, Token, Transformer, v_args, exceptions
 from lark.tree import Meta
 from ss2hcsp.hcsp import expr
+from ss2hcsp.hcsp.expr import Expr
 from ss2hcsp.hcsp import assertion, label
 from ss2hcsp.hcsp import hcsp
+from ss2hcsp.hcsp.hcsp import HCSP
 from ss2hcsp.hcsp import module
 from decimal import Decimal
 
@@ -14,11 +16,11 @@ from ss2hcsp.hcsp.hcsp import HCSPInfo
 
 grammar = r"""
     ?lname: CNAME -> var_expr
-        | CNAME "[" expr "]" -> array_idx_expr
+        | CNAME "[" expr "]" -> array_idx_expr1
         | CNAME "[" expr "]" "[" expr "]" -> array_idx_expr2
-        | CNAME "[" expr "]" "[" expr "]""[" expr "]" -> array_idx_expr3
-        | lname "." CNAME -> field_expr
-        | lname "." CNAME "[" expr "]" -> field_array_idx
+        | atom_expr "[" expr "]" -> array_idx_expr
+        | CNAME "." CNAME -> field_expr_cname
+        | atom_expr "." CNAME -> field_expr
 
     ?atom_expr: lname
         | SIGNED_NUMBER -> num_expr
@@ -71,10 +73,10 @@ grammar = r"""
 
     ?imp: equiv "->" imp | equiv                  // Implies: priority 20
 
-    ?quant: "\\exists" CNAME "." quant                         -> exists_expr  // priority 10
-        | "\\exists" "{" CNAME ("," CNAME)+ "}" "." quant      -> exists_expr
-        | "\\forall" CNAME "." quant                       -> forall_expr
-        | "\\forall" "{" CNAME ("," CNAME)+ "}" "." quant  -> forall_expr
+    ?quant: "exists" CNAME "." quant                         -> exists_expr  // priority 10
+        | "exists" "{" CNAME ("," CNAME)+ "}" "." quant      -> exists_expr
+        | "forall" CNAME "." quant                       -> forall_expr
+        | "forall" "{" CNAME ("," CNAME)+ "}" "." quant  -> forall_expr
         | imp
 
     ?expr: quant
@@ -180,7 +182,7 @@ grammar = r"""
 
     ?module_outputs: "output" module_output ("," module_output)* ";"  -> module_outputs
     
-    ?module: "module" module_sig ":" (module_outputs)* (procedure)* "begin" cmd "end" "endmodule"
+    ?hcsp_module: "module" module_sig ":" (module_outputs)* (procedure)* "begin" cmd "end" "endmodule"
     
     ?module_arg: CNAME ("[" INT "]")*   -> module_arg_channel
         | "$" expr    -> module_arg_expr
@@ -195,7 +197,7 @@ grammar = r"""
 
     ?import: "import" CNAME   -> hcsp_import
 
-    ?decls: "%type: module" (module | import | system)* -> decls
+    ?decls: "%type: module" (hcsp_module | import | system)* -> decls
 
     %import common.CNAME
     %import common.WS
@@ -248,20 +250,20 @@ class HPTransformer(Transformer):
             pairs.append((str(args[i]), args[i+1]))
         return expr.DictExpr(*pairs, meta=meta)
 
-    def array_idx_expr(self, meta, a, i):
+    def array_idx_expr1(self, meta, a: Token, i: Expr) -> Expr:
         return expr.ArrayIdxExpr(expr.AVar(str(a)), i, meta=meta)
-    
-    def array_idx_expr2(self, meta, a, i, j):
-        return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(str(a)), i, meta=meta), j, meta=meta)
 
-    def array_idx_expr3(self, meta, a, i, j, k):
-        return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(str(a)), i, meta=meta), j, meta=meta), k, meta=meta)
+    def array_idx_expr2(self, meta, a: Token, i: Expr, j: Expr) -> Expr:
+        return expr.ArrayIdxExpr(expr.ArrayIdxExpr(expr.AVar(str(a)), i), j, meta=meta)
 
-    def field_array_idx(self, meta, e, field, i):
-        return expr.ArrayIdxExpr(expr.FieldNameExpr(e, field, meta=meta), i, meta=meta)
+    def array_idx_expr(self, meta, a: Expr, i: Expr) -> Expr:
+        return expr.ArrayIdxExpr(a, i, meta=meta)
 
-    def field_expr(self, meta, e, field):
-        return expr.FieldNameExpr(e, field, meta=meta)
+    def field_expr_cname(self, meta, e: Token, field: Token) -> Expr:
+        return expr.FieldNameExpr(expr.AVar(str(e)), str(field), meta=meta)
+
+    def field_expr(self, meta, e: Expr, field: Token) -> Expr:
+        return expr.FieldNameExpr(e, str(field), meta=meta)
 
     def if_expr(self, meta, cond, e1, e2):
         return expr.IfExpr(cond, e1, e2, meta=meta)
@@ -580,7 +582,7 @@ class HPTransformer(Transformer):
     def hoare_post(self, meta, *args):
         return list(args)
 
-    def hoare_triple(self, meta, *args):
+    def hoare_triple(self, meta, *args) -> hcsp.HoareTriple:
         # The last three arguments are pre, hp, and post.
         pre = args[-3]
         hp = args[-2]
@@ -610,7 +612,7 @@ class HPTransformer(Transformer):
     def module_outputs(self, meta, *args):
         return tuple(args)
 
-    def module(self, meta, *args):
+    def hcsp_module(self, meta, *args) -> module.HCSPModule:
         # The first item is a tuple consisting of name and list of parameters
         # The middle items are the output sequences or procedure declarations
         # The last item is code for the module
@@ -673,11 +675,11 @@ class HPTransformer(Transformer):
                     error_str += " " * (e.column-1) + "^" + '\n'
             raise ParseFileException(error_str)
 
-    def system(self, meta, *args):
+    def system(self, meta, *args) -> module.HCSPSystem:
         # Each item is a module instantiation
         return module.HCSPSystem(args, meta=meta)
 
-    def decls(self, meta, *args):
+    def decls(self, meta, *args) -> module.HCSPDeclarations:
         # A list of declarations.
         return module.HCSPDeclarations(args, meta=meta)
 
@@ -685,25 +687,51 @@ hp_transformer = HPTransformer()
 
 expr_parser = Lark(grammar, start="expr", parser="lalr", transformer=hp_transformer)
 hp_parser = Lark(grammar, start="parallel_cmd", parser="lalr", transformer=hp_transformer)
-module_parser = Lark(grammar, start="module", parser="lalr", transformer=hp_transformer)
+module_parser = Lark(grammar, start="hcsp_module", parser="lalr", transformer=hp_transformer)
 system_parser = Lark(grammar, start="system", parser="lalr", transformer=hp_transformer)
 decls_parser = Lark(grammar, start="decls", parser="lalr", transformer=hp_transformer)
+
+def parse_expr(text: str) -> Expr:
+    return expr_parser.parse(text)
+
+def parse_hp(text: str) -> HCSP:
+    return hp_parser.parse(text)
+
+def parse_module(text: str) -> module.HCSPModule:
+    return module_parser.parse(text)
+
+def parse_system(text: str) -> module.HCSPSystem:
+    return system_parser.parse(text)
+
+def parse_decls(text: str) -> module.HCSPDeclarations:
+    return decls_parser.parse(text)
 
 # Variants of the parsers without internal transformer, returning a Lark Tree instead of a HCSP expression.
 # They allow us to get meta information about line and character numbers of the parsed code.
 expr_tree_parser = Lark(grammar, start="expr", parser="lalr", propagate_positions=True)
 hp_tree_parser = Lark(grammar, start="parallel_cmd", parser="lalr", propagate_positions=True)
 hoare_triple_tree_parser = Lark(grammar, start="hoare_triple", parser="lalr", propagate_positions=True)
-module_tree_parser = Lark(grammar, start="module", parser="lalr", propagate_positions=True)
+module_tree_parser = Lark(grammar, start="hcsp_module", parser="lalr", propagate_positions=True)
 system_tree_parser = Lark(grammar, start="system", parser="lalr", propagate_positions=True)
 decls_tree_parser = Lark(grammar, start="decls", parser="lalr", propagate_positions=True)
 
-def parse_expr_with_meta(text): return hp_transformer.transform(expr_tree_parser.parse(text))
-def parse_hp_with_meta(text): return hp_transformer.transform(hp_tree_parser.parse(text))
-def parse_hoare_triple_with_meta(text): return hp_transformer.transform(hoare_triple_tree_parser.parse(text))
-def parse_module_with_meta(text): return hp_transformer.transform(module_tree_parser.parse(text))
-def parse_system_with_meta(text): return hp_transformer.transform(system_tree_parser.parse(text))
-def parse_decls_with_meta(text): return hp_transformer.transform(decls_tree_parser.parse(text))
+def parse_expr_with_meta(text) -> Expr:
+    return hp_transformer.transform(expr_tree_parser.parse(text))
+
+def parse_hp_with_meta(text) -> HCSP:
+    return hp_transformer.transform(hp_tree_parser.parse(text))
+
+def parse_hoare_triple_with_meta(text) -> hcsp.HoareTriple:
+    return hp_transformer.transform(hoare_triple_tree_parser.parse(text))
+
+def parse_module_with_meta(text) -> module.HCSPModule:
+    return hp_transformer.transform(module_tree_parser.parse(text))
+
+def parse_system_with_meta(text) -> module.HCSPSystem:
+    return hp_transformer.transform(system_tree_parser.parse(text))
+
+def parse_decls_with_meta(text) -> module.HCSPDeclarations:
+    return hp_transformer.transform(decls_tree_parser.parse(text))
 
 
 class ParseFileException(Exception):

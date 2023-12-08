@@ -1,4 +1,14 @@
+
 ## **Dependencies**
+
+### **Python**
+
+We assume Python version 3.12. The list of Python packages can be installed via
+
+```cmd
+   python -m pip install -r requirements.txt   
+```
+
 ### **Lark**
 Used in: all
 
